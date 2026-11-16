@@ -1475,6 +1475,11 @@ body.clinic .alert-info {
     body.clinic .app,
     body.clinic .app.layout { grid-template-columns: minmax(0, 1fr); }
 
+    /* .app (z-index: 1) membuat stacking context, jadi laci di dalamnya ikut
+       "berlantai 1" dan tertutup lapisan gelap (z-index: 65) milik <body>. */
+    body.clinic .app,
+    body.clinic .app.layout { z-index: auto; }
+
     body.clinic .topbar { gap: 8px; }
 
     body.clinic .nav-toggle {
