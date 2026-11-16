@@ -1,0 +1,1796 @@
+/* ============================================================
+   NutriCare: papan kerja klinis (HMS)
+   Sumber arah: Downloads/DESIGN.md (dial ENERGY 1 / RHYTHM 2 / MOTION 1)
+   Cakupan: hanya halaman perawat (body.clinic). Halaman lain tidak berubah.
+   Prinsip: kertas putih, garis 1px, satu warna aksi (petrol), pita status
+   hanya saat butuh perhatian, angka tabular, pengenal monospace.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
+
+/* ---------- 1. Token ---------- */
+
+body.clinic,
+body.clinic[data-theme] {
+    --c-paper: #F4F6F7;
+    --c-surface: #FFFFFF;
+    --c-surface-muted: #EAEFF1;
+    --c-border: #D5DDE1;
+    --c-border-strong: #74848D;
+    --c-ink: #16262E;
+    --c-muted: #475963;
+    --c-brand: #0A6C85;
+    --c-brand-deep: #07566B;
+    --c-brand-tint: #E3F1F5;
+    --c-brand-solid: #0A6C85;
+    --c-brand-solid-hover: #07566B;
+    --c-on-brand: #FFFFFF;
+    --c-focus: #07566B;
+    --c-critical: #B42318;
+    --c-critical-tint: #FDECEA;
+    --c-critical-rail: #D92D20;
+    --c-warning: #8A5A00;
+    --c-warning-tint: #FFF4DB;
+    --c-warning-rail: #B87700;
+    --c-success: #1B6B3A;
+    --c-success-tint: #E6F4EA;
+    --c-success-rail: #2E8B57;
+    --c-disabled-fg: #8A99A1;
+    --c-disabled-bg: #EAEFF1;
+    --c-scrim: rgba(22, 38, 46, .48);
+    --c-shadow-menu: 0 4px 16px rgba(22, 38, 46, .14);
+    --c-shadow-dialog: 0 12px 40px rgba(22, 38, 46, .22);
+
+    --c-font: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    --c-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+    --c-r-sm: 4px;
+    --c-r-md: 6px;
+    --c-r-lg: 8px;
+
+    --c-rail: 4px;
+
+    /* Selaraskan token lama agar komponen bersama ikut membaca nilai baru */
+    --bg: var(--c-paper);
+    --panel: var(--c-surface);
+    --panel2: var(--c-surface-muted);
+    --text: var(--c-ink);
+    --muted: var(--c-muted);
+    --border: var(--c-border);
+    --green: var(--c-brand);
+    --pink: var(--c-critical);
+}
+
+/* Tema gelap: turunan dari keluarga warna yang sama, bukan palet kedua.
+   Alasan: aplikasi punya saklar tema global, dan mode gelap tidak boleh rusak. */
+body.clinic[data-theme="dark"] {
+    --c-paper: #0E1518;
+    --c-surface: #141E22;
+    --c-surface-muted: #1B272C;
+    --c-border: #2A3A40;
+    --c-border-strong: #6C8189;
+    --c-ink: #E9EFF2;
+    --c-muted: #A8B8BE;
+    --c-brand: #4FB3CC;
+    --c-brand-deep: #6ECBE2;
+    --c-brand-tint: #17323B;
+    --c-brand-solid: #0A6C85;
+    --c-brand-solid-hover: #0B6274;
+    --c-on-brand: #FFFFFF;
+    --c-focus: #6ECBE2;
+    --c-critical: #F08A80;
+    --c-critical-tint: #33161A;
+    --c-critical-rail: #E5544A;
+    --c-warning: #E0A94A;
+    --c-warning-tint: #2A2110;
+    --c-warning-rail: #C98A1E;
+    --c-success: #7ACB93;
+    --c-success-tint: #12251B;
+    --c-success-rail: #3E9E63;
+    --c-disabled-fg: #7B8B92;
+    --c-disabled-bg: #1B272C;
+    --c-scrim: rgba(6, 12, 14, .62);
+    --c-shadow-menu: 0 4px 16px rgba(0, 0, 0, .42);
+    --c-shadow-dialog: 0 12px 40px rgba(0, 0, 0, .55);
+}
+
+/* ---------- 2. Dasar ---------- */
+
+body.clinic {
+    background: var(--c-paper);
+    color: var(--c-ink);
+    font: 400 14px/1.5 var(--c-font);
+    -webkit-font-smoothing: antialiased;
+}
+
+body.clinic .app:not(.layout) {
+    grid-template-columns: 248px minmax(0, 1fr);
+    background: var(--c-paper);
+}
+
+/* Halaman dengan .layout memakai kolom sidebar sendiri dari role-pages.css */
+body.clinic .app.layout { background: var(--c-paper); }
+
+body.clinic h1,
+body.clinic h2,
+body.clinic h3,
+body.clinic .page-head h1,
+body.clinic .panel h2,
+body.clinic .panel h3,
+body.clinic .ledger-value,
+body.clinic .stat-value {
+    font-family: var(--c-font);
+    letter-spacing: 0;
+}
+
+body.clinic .page-head h1 { font-size: 24px; font-weight: 600; line-height: 1.25; }
+body.clinic .panel h2,
+body.clinic .panel-head h2 { font-size: 15px; font-weight: 600; line-height: 1.35; }
+body.clinic .panel h3 { font-size: 15px; font-weight: 600; }
+
+/* Cincin fokus tunggal, terlihat di semua latar */
+body.clinic a:focus-visible,
+body.clinic button:focus-visible,
+body.clinic input:focus-visible,
+body.clinic select:focus-visible,
+body.clinic textarea:focus-visible,
+body.clinic [tabindex]:focus-visible {
+    outline: 3px solid var(--c-focus);
+    outline-offset: 2px;
+    border-radius: var(--c-r-sm);
+}
+
+body.clinic .sr-only {
+    width: 1px; height: 1px; position: absolute; overflow: hidden;
+    clip: rect(0, 0, 0, 0); white-space: nowrap; clip-path: inset(50%);
+}
+
+/* ---------- 3. Sidebar ---------- */
+
+body.clinic .sidebar,
+body.clinic[data-theme="light"] .sidebar,
+body.clinic[data-theme="dark"] .sidebar {
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-radius: var(--c-r-lg);
+    box-shadow: none;
+    padding: 20px 16px;
+}
+
+body.clinic .sidebar .brand::after { display: none; }
+
+body.clinic .brand {
+    gap: 10px;
+    padding: 0 8px 18px;
+    border-bottom: 1px solid var(--c-border);
+}
+
+body.clinic .brand-logo { width: 30px; height: 30px; }
+body.clinic .brand-name { color: var(--c-ink); font-size: 15px; font-weight: 600; letter-spacing: 0; }
+body.clinic .brand-name span,
+body.clinic[data-theme="light"] .brand-name span { color: var(--c-brand); }
+body.clinic .brand small { color: var(--c-muted); font-size: 11px; letter-spacing: 0; }
+
+body.clinic .sidebar-date,
+body.clinic[data-theme="light"] .sidebar-date,
+body.clinic[data-theme="dark"] .sidebar-date {
+    margin: 14px 0 4px;
+    padding: 8px 8px;
+    background: var(--c-surface-muted);
+    border-radius: var(--c-r-sm);
+    color: var(--c-muted);
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0;
+    text-transform: none;
+}
+
+body.clinic .nav-title,
+body.clinic[data-theme="light"] .nav-title {
+    margin: 18px 8px 8px;
+    color: var(--c-muted);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0;
+    text-transform: none;
+}
+
+body.clinic .nav-link,
+body.clinic[data-theme="light"] .nav-link,
+body.clinic[data-theme="dark"] .nav-link {
+    min-height: 40px;
+    gap: 10px;
+    padding: 9px 10px;
+    color: var(--c-ink);
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: var(--c-r-md);
+    font-size: 13px;
+    font-weight: 500;
+    transition: background 120ms cubic-bezier(.2, 0, 0, 1), color 120ms cubic-bezier(.2, 0, 0, 1);
+}
+
+body.clinic .nav-link:hover,
+body.clinic[data-theme="light"] .nav-link:hover,
+body.clinic[data-theme="dark"] .nav-link:hover {
+    color: var(--c-ink);
+    background: var(--c-surface-muted);
+}
+
+body.clinic .nav-link.active,
+body.clinic[data-theme="light"] .nav-link.active,
+body.clinic[data-theme="dark"] .nav-link.active,
+body.clinic .app.layout > .sidebar .nav-link.active,
+body.clinic[data-theme="light"] .app.layout > .sidebar .nav-link.active,
+body.clinic[data-theme="dark"] .app.layout > .sidebar .nav-link.active {
+    color: var(--c-brand-deep);
+    background: var(--c-brand-tint);
+    border-color: transparent;
+    box-shadow: none;
+    font-weight: 600;
+}
+
+/* Menu aktif: tint + teks brand, tanpa bilah aksen dekoratif */
+body.clinic .nav-link::before,
+body.clinic .nav-link.active::before,
+body.clinic .app.layout > .sidebar .nav-link::before { content: none; }
+
+body.clinic .nav-link.active .nav-icon,
+body.clinic[data-theme="light"] .nav-link.active .nav-icon,
+body.clinic[data-theme="dark"] .nav-link.active .nav-icon,
+body.clinic .app.layout > .sidebar .nav-link.active .nav-icon,
+body.clinic .nav-link:hover .nav-icon,
+body.clinic[data-theme="light"] .nav-link:hover .nav-icon,
+body.clinic[data-theme="dark"] .nav-link:hover .nav-icon {
+    color: currentColor;
+    background: transparent;
+}
+
+body.clinic .nav-link.active::before { box-shadow: none; }
+
+body.clinic .nav-icon {
+    width: 20px;
+    height: 20px;
+    display: grid;
+    place-items: center;
+    font-size: 0;
+    color: currentColor;
+}
+
+body.clinic .nav-icon svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.5; }
+
+/* ---------- 4. Topbar ---------- */
+
+body.clinic .main { padding: 24px 32px 40px; max-width: 1440px; }
+
+body.clinic .topbar {
+    min-height: 56px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--c-border);
+}
+
+body.clinic .crumb { color: var(--c-muted); font-size: 13px; }
+body.clinic .crumb strong { color: var(--c-ink); font-weight: 600; }
+
+body.clinic .profile-trigger {
+    min-height: 40px;
+    padding: 4px 8px;
+    border-radius: var(--c-r-md);
+    border: 1px solid transparent;
+}
+body.clinic .profile-trigger:hover { background: var(--c-surface-muted); }
+
+body.clinic .avatar,
+body.clinic[data-theme="light"] .avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--c-brand-tint);
+    color: var(--c-brand-deep);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+body.clinic .profile-name { color: var(--c-ink); font-size: 13px; font-weight: 600; }
+body.clinic .profile-role { color: var(--c-muted); font-size: 12px; }
+
+body.clinic .notification-bell {
+    width: 40px; height: 40px;
+    border: 1px solid transparent;
+    border-radius: var(--c-r-md);
+    color: var(--c-ink);
+}
+body.clinic .notification-bell:hover { background: var(--c-surface-muted); }
+body.clinic .notification-badge { background: var(--c-brand-solid); color: var(--c-on-brand); }
+
+/* ---------- 5. Kepala halaman dan tombol ---------- */
+
+body.clinic .page-head {
+    align-items: flex-start;
+    gap: 24px;
+    margin: 28px 0 24px;
+}
+
+body.clinic .page-head p {
+    max-width: 68ch;
+    margin: 6px 0 0;
+    color: var(--c-muted);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+body.clinic .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 40px;
+    padding: 0 16px;
+    color: var(--c-on-brand);
+    background: var(--c-brand-solid);
+    border: 1px solid var(--c-brand-solid);
+    border-radius: var(--c-r-md);
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: 0;
+    text-align: center;
+    transition: background 120ms cubic-bezier(.2, 0, 0, 1), border-color 120ms cubic-bezier(.2, 0, 0, 1);
+}
+
+body.clinic .btn:hover { background: var(--c-brand-solid-hover); border-color: var(--c-brand-solid-hover); }
+body.clinic .btn:active { background: var(--c-brand-solid-hover); }
+
+body.clinic .btn-ghost,
+body.clinic .btn.btn-ghost {
+    color: var(--c-ink);
+    background: var(--c-surface);
+    border: 1px solid var(--c-border-strong);
+}
+body.clinic .btn-ghost:hover,
+body.clinic .btn.btn-ghost:hover { background: var(--c-paper); border-color: var(--c-ink); }
+
+body.clinic .btn-danger {
+    color: #FFFFFF;
+    background: var(--c-critical);
+    border-color: var(--c-critical);
+}
+
+body.clinic .btn-small { min-height: 32px; padding: 0 10px; font-size: 13px; font-weight: 500; }
+
+body.clinic .text-link {
+    color: var(--c-brand);
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+}
+body.clinic .text-link:hover { color: var(--c-brand-deep); text-decoration: underline; }
+
+/* ---------- 6. Ringkasan hari ini: satu baris angka, bukan empat kartu ---------- */
+
+body.clinic .clinic-metrics,
+body.clinic .ledger {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0;
+    margin-top: 0;
+    padding: 0;
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-radius: var(--c-r-lg);
+    overflow: hidden;
+}
+
+body.clinic .clinic-metric,
+body.clinic .ledger-cell,
+body.clinic .stat-card,
+body.clinic[data-theme="light"] .ledger-cell {
+    min-width: 0;
+    padding: 16px 20px;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+}
+
+body.clinic .clinic-metric + .clinic-metric,
+body.clinic .ledger-cell + .ledger-cell { border-left: 1px solid var(--c-border); }
+
+body.clinic .dash-ledger .ledger-cell::before { display: none; content: none; }
+
+body.clinic .clinic-metric-label,
+body.clinic .ledger-label,
+body.clinic .stat-title,
+body.clinic[data-theme="light"] .ledger-label,
+body.clinic[data-theme="light"] .stat-title {
+    color: var(--c-muted);
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.3;
+    letter-spacing: 0;
+    text-transform: none;
+}
+
+/* 28px, bukan 36px: empat angka sebaris harus tunduk pada antrean tindakan,
+   yang menjadi satu-satunya titik fokus layar. */
+body.clinic .clinic-metric-value,
+body.clinic .ledger-value,
+body.clinic .stat-value,
+body.clinic[data-theme="light"] .ledger-value,
+body.clinic[data-theme="light"] .stat-value {
+    margin-top: 6px;
+    color: var(--c-ink);
+    font-family: var(--c-font);
+    font-size: 28px;
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    font-variant-numeric: tabular-nums;
+}
+
+body.clinic .clinic-metric-unit {
+    margin-left: 6px;
+    color: var(--c-muted);
+    font-size: 13px;
+    font-weight: 400;
+}
+
+body.clinic .clinic-metric-note,
+body.clinic .ledger-note,
+body.clinic .stat-note,
+body.clinic[data-theme="light"] .ledger-note {
+    margin-top: 4px;
+    color: var(--c-muted);
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+body.clinic .ledger-note.bad,
+body.clinic .negative { color: var(--c-warning); }
+body.clinic .ledger-note.ok,
+body.clinic .positive { color: var(--c-success); }
+
+/* ---------- 7. Panel ---------- */
+
+body.clinic .panel {
+    padding: 20px;
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-radius: var(--c-r-lg);
+    box-shadow: none;
+}
+
+body.clinic .panel-head {
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+body.clinic .panel-head p {
+    margin: 4px 0 0;
+    color: var(--c-muted);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+body.clinic .grid-wide,
+body.clinic .grid-2 { gap: 24px; margin-top: 24px; }
+
+body.clinic .page.is-active { animation: none; }
+
+/* ---------- 8. Antrean "Perlu tindakan" ---------- */
+
+body.clinic .queue {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--c-border);
+}
+
+body.clinic .queue-row {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-height: 44px;
+    padding: 12px 12px 12px 16px;
+    border-bottom: 1px solid var(--c-border);
+}
+
+body.clinic .queue-row:last-child { border-bottom: 0; }
+
+/* Pita status: hanya muncul saat baris butuh perhatian, tidak pernah sebagai hiasan */
+body.clinic .queue-row[data-tone="warning"]::before,
+body.clinic .queue-row[data-tone="critical"]::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 8px;
+    bottom: 8px;
+    width: var(--c-rail);
+    border-radius: 2px;
+}
+
+body.clinic .queue-row[data-tone="warning"]::before { background: var(--c-warning-rail); }
+body.clinic .queue-row[data-tone="critical"]::before { background: var(--c-critical-rail); }
+
+body.clinic .queue-body { flex: 1 1 auto; min-width: 0; }
+body.clinic .queue-title {
+    margin: 0;
+    color: var(--c-ink);
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.4;
+}
+body.clinic .queue-note {
+    margin: 2px 0 0;
+    color: var(--c-muted);
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+body.clinic .queue-meta {
+    flex: 0 0 auto;
+    color: var(--c-muted);
+    font-family: var(--c-mono);
+    font-size: 13px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+}
+
+body.clinic .queue-action {
+    flex: 0 0 auto;
+    color: var(--c-brand);
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+body.clinic .queue-action:hover { color: var(--c-brand-deep); text-decoration: underline; }
+
+body.clinic .queue-empty {
+    margin: 0;
+    padding: 14px 0;
+    color: var(--c-muted);
+    font-size: 14px;
+}
+
+/* ---------- 9. Tabel ---------- */
+
+body.clinic .table-wrap { overflow-x: auto; }
+
+body.clinic table { width: 100%; border-collapse: collapse; text-align: left; white-space: nowrap; }
+
+body.clinic th {
+    padding: 0 12px;
+    height: 36px;
+    color: var(--c-muted);
+    background: var(--c-surface-muted);
+    border-bottom: 1px solid var(--c-border);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0;
+    text-transform: none;
+}
+
+body.clinic th:first-child { border-top-left-radius: var(--c-r-sm); border-bottom-left-radius: var(--c-r-sm); }
+body.clinic th:last-child { border-top-right-radius: var(--c-r-sm); border-bottom-right-radius: var(--c-r-sm); }
+
+body.clinic td {
+    height: 44px;
+    padding: 10px 12px;
+    color: var(--c-ink);
+    border-bottom: 1px solid var(--c-border);
+    font-size: 14px;
+    font-variant-numeric: tabular-nums;
+}
+
+body.clinic tbody tr:last-child td { border-bottom: 0; }
+body.clinic tbody tr:hover td { background: var(--c-paper); }
+
+body.clinic td strong { color: var(--c-ink); font-weight: 600; }
+body.clinic td small { margin-top: 2px; color: var(--c-muted); font-size: 13px; }
+body.clinic .cell-empty { color: var(--c-muted); font-style: normal; }
+
+/* ---------- 10. Lencana status: ikon + teks + warna, bukan kapsul ---------- */
+
+body.clinic .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 24px;
+    max-width: 240px;
+    padding: 0 8px;
+    border: 1px solid transparent;
+    border-radius: var(--c-r-sm);
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+body.clinic .badge::before {
+    content: "";
+    width: 14px;
+    height: 14px;
+    flex: 0 0 auto;
+    background: currentColor;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+}
+
+/* Bentuk berbeda per status: segi delapan, segitiga, lingkaran, lingkaran kosong */
+body.clinic .badge.danger::before {
+    -webkit-mask-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M8.2 2h7.6L22 8.2v7.6L15.8 22H8.2L2 15.8V8.2zM11 7h2v7h-2zm0 9h2v2h-2z'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M8.2 2h7.6L22 8.2v7.6L15.8 22H8.2L2 15.8V8.2zM11 7h2v7h-2zm0 9h2v2h-2z'/%3E%3C/svg%3E");
+}
+
+body.clinic .badge.warning::before {
+    -webkit-mask-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M12 2.4 23 21.2H1zM11 9h2v6h-2zm0 7.6h2v2h-2z'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M12 2.4 23 21.2H1zM11 9h2v6h-2zm0 7.6h2v2h-2z'/%3E%3C/svg%3E");
+}
+
+body.clinic .badge.good::before {
+    -webkit-mask-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm4.7 7.2-5.7 5.7-3.7-3.7 1.4-1.4 2.3 2.3 4.3-4.3z'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm4.7 7.2-5.7 5.7-3.7-3.7 1.4-1.4 2.3 2.3 4.3-4.3z'/%3E%3C/svg%3E");
+}
+
+body.clinic .badge.neutral::before {
+    -webkit-mask-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM7 11h10v2H7z'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM7 11h10v2H7z'/%3E%3C/svg%3E");
+}
+
+body.clinic .badge.danger { color: var(--c-critical); background: var(--c-critical-tint); border-color: rgba(180, 35, 24, .18); }
+body.clinic .badge.warning { color: var(--c-warning); background: var(--c-warning-tint); border-color: rgba(138, 90, 0, .18); }
+body.clinic .badge.good { color: var(--c-success); background: var(--c-success-tint); border-color: rgba(27, 107, 58, .18); }
+body.clinic .badge.neutral { color: var(--c-muted); background: var(--c-surface-muted); border-color: var(--c-border); }
+
+/* Penanda alergi pada baris tabel: status, bukan hiasan */
+body.clinic .row-flag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    height: 20px;
+    margin-top: 4px;
+    padding: 0 6px;
+    color: var(--c-critical);
+    background: var(--c-critical-tint);
+    border: 1px solid rgba(180, 35, 24, .18);
+    border-radius: var(--c-r-sm);
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: 0;
+    text-transform: none;
+    white-space: nowrap;
+}
+body.clinic .row-flag::before {
+    content: "";
+    width: 12px;
+    height: 12px;
+    flex: 0 0 auto;
+    background: currentColor;
+    -webkit-mask-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M8.2 2h7.6L22 8.2v7.6L15.8 22H8.2L2 15.8V8.2zM11 7h2v7h-2zm0 9h2v2h-2z'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M8.2 2h7.6L22 8.2v7.6L15.8 22H8.2L2 15.8V8.2zM11 7h2v7h-2zm0 9h2v2h-2z'/%3E%3C/svg%3E");
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+}
+
+/* ---------- 11. Catatan, keadaan kosong, linimasa ---------- */
+
+body.clinic .notice,
+body.clinic[data-theme="light"] .notice {
+    position: relative;
+    margin-bottom: 12px;
+    padding: 12px 14px;
+    color: var(--c-ink);
+    background: var(--c-surface-muted);
+    border: 1px solid var(--c-border);
+    border-radius: var(--c-r-md);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+body.clinic .notice strong { margin-bottom: 4px; color: var(--c-ink); font-size: 13px; font-weight: 600; }
+
+body.clinic .notice.warn,
+body.clinic[data-theme="light"] .notice.warn {
+    background: var(--c-warning-tint);
+    border-color: rgba(138, 90, 0, .2);
+    padding-left: 16px;
+}
+body.clinic .notice.warn::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 8px; bottom: 8px;
+    width: var(--c-rail);
+    border-radius: 2px;
+    background: var(--c-warning-rail);
+}
+body.clinic .notice.warn strong { color: var(--c-warning); }
+
+body.clinic .notice.bad {
+    background: var(--c-critical-tint);
+    border-color: rgba(180, 35, 24, .2);
+    padding-left: 16px;
+}
+body.clinic .notice.bad::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 8px; bottom: 8px;
+    width: var(--c-rail);
+    border-radius: 2px;
+    background: var(--c-critical-rail);
+}
+body.clinic .notice.bad strong { color: var(--c-critical); }
+
+body.clinic .empty {
+    padding: 20px 12px;
+    color: var(--c-muted);
+    text-align: left;
+}
+body.clinic .empty strong { display: block; margin-bottom: 4px; color: var(--c-ink); font-size: 14px; font-weight: 600; }
+body.clinic .empty p { margin: 0; font-size: 13px; line-height: 1.5; }
+
+body.clinic .dash-timeline { margin: 0; padding: 0; list-style: none; }
+body.clinic .dash-timeline li {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 12px 0;
+    border-top: 1px solid var(--c-border);
+}
+body.clinic .dash-timeline li:first-child { border-top: 0; padding-top: 0; }
+body.clinic .dash-timeline li.dash-empty { color: var(--c-muted); font-size: 13px; }
+
+body.clinic .dash-timeline time {
+    flex: 0 0 auto;
+    padding-top: 2px;
+    color: var(--c-muted);
+    font-family: var(--c-mono);
+    font-size: 13px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+}
+
+body.clinic .dash-timeline li > div { flex: 1 1 auto; min-width: 0; }
+body.clinic .dash-timeline strong { color: var(--c-ink); font-size: 14px; font-weight: 600; }
+body.clinic .dash-timeline p { margin: 2px 0 0; color: var(--c-muted); font-size: 13px; line-height: 1.5; }
+
+/* Titik status lama tidak dipakai lagi: status dibawa lencana berikon */
+body.clinic .dash-dot { display: none; }
+
+/* ---------- 12. Distribusi dan handoff ---------- */
+
+body.clinic .clinic-ratio {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin: 0 0 12px;
+}
+body.clinic .clinic-ratio strong {
+    color: var(--c-ink);
+    font-size: 28px;
+    font-weight: 600;
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+}
+body.clinic .clinic-ratio span { color: var(--c-muted); font-size: 13px; }
+
+body.clinic .dash-track {
+    height: 8px;
+    background: var(--c-surface-muted);
+    border-radius: var(--c-r-sm);
+    overflow: hidden;
+}
+body.clinic .dash-fill { height: 100%; background: var(--c-brand-solid); border-radius: inherit; }
+
+body.clinic .dash-chips { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 16px; }
+body.clinic .dash-chip {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+    padding: 0;
+    background: none;
+    border: 0;
+    color: var(--c-muted);
+    font-size: 13px;
+}
+body.clinic .dash-chip b { color: var(--c-ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+
+body.clinic .handoff-list { display: flex; flex-direction: column; gap: 0; }
+body.clinic .handoff-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-height: 44px;
+    padding: 10px 0;
+    background: none;
+    border: 0;
+    border-top: 1px solid var(--c-border);
+    border-radius: 0;
+}
+body.clinic .handoff-row:first-child { border-top: 0; }
+body.clinic .handoff-jam {
+    flex: 0 0 auto;
+    color: var(--c-ink);
+    font-family: var(--c-mono);
+    font-size: 13px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+}
+body.clinic .handoff-who { flex: 1 1 auto; min-width: 0; }
+body.clinic .handoff-who strong { color: var(--c-ink); font-size: 14px; font-weight: 600; }
+body.clinic .handoff-who small { color: var(--c-muted); font-size: 13px; }
+body.clinic .handoff-tag {
+    flex: 0 0 auto;
+    padding: 0 8px;
+    height: 24px;
+    display: inline-flex;
+    align-items: center;
+    color: var(--c-success);
+    background: var(--c-success-tint);
+    border: 1px solid rgba(27, 107, 58, .18);
+    border-radius: var(--c-r-sm);
+    font-size: 13px;
+    font-weight: 500;
+}
+
+/* ---------- 13. Formulir dan kontrol ---------- */
+
+body.clinic .crud-search input,
+body.clinic .crud-filter select,
+body.clinic .crud-filter input[type="date"],
+body.clinic .crud-form input,
+body.clinic .crud-form select,
+body.clinic .crud-form textarea,
+body.clinic .field input,
+body.clinic .field select,
+body.clinic .field textarea,
+body.clinic[data-theme="light"] .crud-search input,
+body.clinic[data-theme="light"] .crud-filter select,
+body.clinic[data-theme="light"] .crud-form input,
+body.clinic[data-theme="light"] .crud-form select,
+body.clinic[data-theme="light"] .crud-form textarea,
+body.clinic[data-theme="light"] .field input,
+body.clinic[data-theme="light"] .field select,
+body.clinic[data-theme="light"] .field textarea {
+    min-height: 40px;
+    padding: 8px 12px;
+    color: var(--c-ink);
+    background: var(--c-surface);
+    border: 1px solid var(--c-border-strong);
+    border-radius: var(--c-r-md);
+    font-size: 14px;
+    outline: none;
+}
+
+body.clinic .crud-search input:focus,
+body.clinic .crud-filter select:focus,
+body.clinic .crud-form input:focus,
+body.clinic .crud-form select:focus,
+body.clinic .crud-form textarea:focus,
+body.clinic .field input:focus,
+body.clinic .field select:focus,
+body.clinic .field textarea:focus {
+    border-color: var(--c-brand-deep);
+    box-shadow: 0 0 0 3px var(--c-brand-tint);
+}
+
+body.clinic .field label { color: var(--c-ink); font-size: 13px; font-weight: 500; }
+
+body.clinic .crud-form,
+body.clinic[data-theme="light"] .crud-form {
+    background: var(--c-surface-muted);
+    border: 1px solid var(--c-border);
+    border-radius: var(--c-r-lg);
+}
+
+body.clinic .crud-chip,
+body.clinic .chip {
+    min-height: 32px;
+    padding: 0 10px;
+    color: var(--c-ink);
+    background: var(--c-surface);
+    border: 1px solid var(--c-border-strong);
+    border-radius: var(--c-r-md);
+    font-size: 13px;
+    font-weight: 500;
+}
+body.clinic .crud-chip.is-active,
+body.clinic .chip:hover {
+    color: var(--c-brand-deep);
+    background: var(--c-brand-tint);
+    border-color: var(--c-brand);
+}
+
+body.clinic .crud-card {
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-radius: var(--c-r-lg);
+}
+
+body.clinic .row-actions button,
+body.clinic .form-actions button,
+body.clinic .crud-dialog-close {
+    min-height: 32px;
+    padding: 0 10px;
+    color: var(--c-ink);
+    background: var(--c-surface);
+    border: 1px solid var(--c-border-strong);
+    border-radius: var(--c-r-md);
+    font-size: 13px;
+    font-weight: 500;
+}
+body.clinic .row-actions button:hover,
+body.clinic .form-actions button:hover,
+body.clinic .crud-dialog-close:hover { background: var(--c-paper); }
+
+body.clinic .form-actions .btn,
+body.clinic .form-actions button[type="submit"] {
+    min-height: 40px;
+    padding: 0 16px;
+    color: var(--c-on-brand);
+    background: var(--c-brand-solid);
+    border-color: var(--c-brand-solid);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+body.clinic .form-msg { color: var(--c-critical); font-size: 13px; }
+
+body.clinic .switch span { background: var(--c-disabled-bg); border: 1px solid var(--c-border-strong); }
+body.clinic .switch span:after { background: var(--c-border-strong); }
+body.clinic .switch input:checked + span { background: var(--c-brand-solid); border-color: var(--c-brand-solid); }
+body.clinic .switch input:checked + span:after { background: #FFFFFF; }
+
+/* ---------- 14. Footer ---------- */
+
+body.clinic .footer {
+    margin-top: 32px;
+    padding-top: 16px;
+    color: var(--c-muted);
+    border-top: 1px solid var(--c-border);
+    font-size: 13px;
+}
+
+/* ---------- 15. Menu dan dialog ---------- */
+
+body.clinic .profile-dropdown,
+body.clinic .notification-dropdown {
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-radius: var(--c-r-lg);
+    box-shadow: var(--c-shadow-menu);
+}
+
+body.clinic .profile-dropdown-item { color: var(--c-ink); font-size: 14px; min-height: 40px; }
+body.clinic .profile-dropdown-item:hover { background: var(--c-surface-muted); }
+body.clinic .profile-dropdown-item.danger { color: var(--c-critical); }
+
+/* ---------- 16. Label bagian, daftar sekunder, tombol ciutkan ---------- */
+
+body.clinic .page-head + .clinic-section-label { margin-top: 0; }
+
+body.clinic .clinic-section-label {
+    margin: 24px 0 8px;
+    color: var(--c-muted);
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.3;
+}
+
+/* Panel berdampingan tidak dipaksa sama tinggi: ruang kosong bukan isi */
+body.clinic .dash-grid { align-items: start; }
+
+body.clinic .clinic-sublist { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--c-border); }
+body.clinic .clinic-sublist-title {
+    margin: 0 0 8px;
+    color: var(--c-muted);
+    font-size: 13px;
+    font-weight: 500;
+}
+body.clinic .clinic-sublist ul { margin: 0; padding: 0; list-style: none; }
+body.clinic .clinic-sublist li {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 6px 0;
+    color: var(--c-ink);
+    font-size: 14px;
+    line-height: 1.4;
+}
+body.clinic .clinic-sublist li span { min-width: 0; }
+body.clinic .clinic-sublist li time {
+    flex: 0 0 auto;
+    color: var(--c-muted);
+    font-family: var(--c-mono);
+    font-size: 13px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+}
+body.clinic .clinic-sublist p.clinic-sublist-empty { margin: 0; color: var(--c-muted); font-size: 13px; line-height: 1.5; }
+
+/* Tombol ciutkan sidebar: kontrol tenang di kaki sidebar, bukan kancing mengambang */
+body.clinic .sidebar-toggle {
+    top: auto;
+    bottom: calc(var(--sb-gap) + 18px);
+    left: calc(var(--sb-gap) + 16px);
+    transform: none;
+    width: 26px;
+    height: 26px;
+    color: var(--c-muted);
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-radius: var(--c-r-md);
+    box-shadow: none;
+}
+body.clinic .sidebar-toggle:hover {
+    color: var(--c-brand-deep);
+    background: var(--c-brand-tint);
+    border-color: var(--c-brand);
+    transform: none;
+}
+body.clinic .sidebar-toggle:focus-visible { outline: 3px solid var(--c-focus); outline-offset: 2px; }
+
+/* ---------- 17. Responsif ---------- */
+@media (max-width: 1180px) {
+    body.clinic .clinic-metrics,
+    body.clinic .ledger { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    body.clinic .clinic-metric:nth-child(3),
+    body.clinic .ledger-cell:nth-child(3) { border-left: 0; }
+    body.clinic .clinic-metric:nth-child(n+3),
+    body.clinic .ledger-cell:nth-child(n+3) { border-top: 1px solid var(--c-border); }
+}
+
+@media (max-width: 900px) {
+    body.clinic .main { padding: 20px 20px 32px; }
+    body.clinic .grid-wide,
+    body.clinic .grid-2 { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+    body.clinic .page-head { flex-direction: column; align-items: stretch; gap: 16px; }
+    body.clinic .page-head .btn { width: 100%; }
+}
+
+@media (max-width: 767px) {
+    body.clinic .main { padding: 16px 16px 28px; }
+    body.clinic .app { grid-template-columns: minmax(0, 1fr); }
+    body.clinic .sidebar {
+        position: static;
+        height: auto;
+        border-right: 0;
+        border-bottom: 1px solid var(--c-border);
+    }
+    body.clinic .clinic-metrics,
+    body.clinic .ledger { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    body.clinic .clinic-metric,
+    body.clinic .ledger-cell { border-left: 0 !important; border-top: 1px solid var(--c-border); }
+    body.clinic .clinic-metric:nth-child(-n+2),
+    body.clinic .ledger-cell:nth-child(-n+2) { border-top: 0; }
+    body.clinic .clinic-metric:nth-child(even),
+    body.clinic .ledger-cell:nth-child(even) { border-left: 1px solid var(--c-border) !important; }
+    body.clinic .clinic-metric { padding: 14px 16px; }
+    body.clinic .clinic-metric-value { font-size: 24px; }
+    body.clinic .queue-row { flex-wrap: wrap; gap: 8px 12px; padding-right: 4px; }
+    body.clinic .queue-body { flex: 1 1 100%; }
+    body.clinic .queue-action,
+    body.clinic .queue-meta { margin-left: 0; }
+    body.clinic .queue-action { min-height: 44px; display: inline-flex; align-items: center; }
+    body.clinic .panel { padding: 16px; }
+    body.clinic .page-head h1 { font-size: 22px; }
+    /* Tabel menjadi daftar baris: label kolom tampil sebagai teks kecil */
+    body.clinic table,
+    body.clinic thead,
+    body.clinic tbody,
+    body.clinic tr,
+    body.clinic td { display: block; width: 100%; }
+    body.clinic thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+    body.clinic tr { padding: 12px 0; border-bottom: 1px solid var(--c-border); }
+    body.clinic tr:last-child { border-bottom: 0; }
+    body.clinic td {
+        height: auto;
+        padding: 2px 0;
+        border: 0;
+        white-space: normal;
+    }
+    body.clinic td strong { display: inline; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    body.clinic *,
+    body.clinic *::before,
+    body.clinic *::after {
+        animation-duration: .001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .001ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+@media (prefers-contrast: more) {
+    body.clinic .badge,
+    body.clinic .panel,
+    body.clinic .clinic-metrics { border-color: var(--c-ink); }
+}
+
+/* ---------- 17. Komponen bersama halaman peran lain ---------- */
+
+body.clinic .page-head-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+body.clinic .clinic-metrics[data-cols="3"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+body.clinic .clinic-metrics[data-cols="2"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+/* Waktu makan: nama, jumlah pasien, rentang jam */
+body.clinic .slots { gap: 12px; }
+body.clinic .slot {
+    display: grid;
+    gap: 3px;
+    padding: 14px 16px;
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-radius: var(--c-r-md);
+}
+body.clinic .slot span:first-child { color: var(--c-ink); font-size: 15px; font-weight: 600; line-height: 1.35; }
+body.clinic .slot strong { color: var(--c-ink); font-size: 20px; font-weight: 600; line-height: 1.2; font-variant-numeric: tabular-nums; }
+body.clinic .slot span:last-child { color: var(--c-muted); font-family: var(--c-mono); font-size: 12px; font-variant-numeric: tabular-nums; }
+
+@media (max-width: 900px) {
+    body.clinic .clinic-metrics[data-cols="3"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    body.clinic .clinic-metrics[data-cols="3"] .clinic-metric:nth-child(3) { border-left: 0; border-top: 1px solid var(--c-border); }
+}
+
+@media (max-width: 560px) {
+    body.clinic .clinic-metrics[data-cols="3"] { grid-template-columns: minmax(0, 1fr); }
+    body.clinic .clinic-metrics[data-cols="3"] .clinic-metric + .clinic-metric { border-left: 0; border-top: 1px solid var(--c-border); }
+    body.clinic .slots { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* ---------- 18. Pemetaan komponen halaman logistik ---------- */
+
+body.clinic .page-heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin: 0 0 24px;
+}
+body.clinic .page-heading h1 { margin: 2px 0 6px; }
+body.clinic .page-heading p { margin: 0; color: var(--c-muted); font-size: 14px; line-height: 1.5; }
+body.clinic .eyebrow {
+    display: block;
+    margin-bottom: 2px;
+    color: var(--c-muted);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: .03em;
+}
+
+/* Strip metrik */
+body.clinic .stats,
+body.clinic #dashboard .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(168px, 1fr));
+    gap: 0;
+    margin-top: 24px;
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-radius: var(--c-r-lg);
+    overflow: hidden;
+}
+body.clinic .stat-card,
+body.clinic #dashboard .stat-card {
+    position: static;
+    padding: 16px 20px;
+    background: none;
+    border: 0;
+    border-radius: 0;
+    transition: none;
+}
+body.clinic .stat-card:hover,
+body.clinic #dashboard .stat-card:hover { border-color: transparent; transform: none; }
+body.clinic .stat-card::before,
+body.clinic #dashboard .stat-card::before { content: none; }
+body.clinic .stat-card + .stat-card { border-left: 1px solid var(--c-border); }
+body.clinic .stat-top,
+body.clinic #dashboard .stat-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+body.clinic .stat-title,
+body.clinic #dashboard .stat-title {
+    color: var(--c-muted);
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.35;
+    min-height: 32px;
+    letter-spacing: 0;
+    text-transform: none;
+}
+body.clinic .stat-value,
+body.clinic #dashboard .stat-value { color: var(--c-ink); font-size: 26px; font-weight: 600; line-height: 1.15; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+body.clinic .stat-icon { display: none; }
+body.clinic .stat-meter { height: 6px; margin: 10px 0 6px; border-radius: 999px; background: var(--c-surface-muted); overflow: hidden; }
+body.clinic .stat-meter-fill { display: block; width: 0; height: 100%; border-radius: 999px; background: var(--c-brand); transition: width 200ms cubic-bezier(.2, 0, 0, 1); }
+body.clinic .stat-meter-legend { color: var(--c-muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+body.clinic .stat-note,
+body.clinic #dashboard .stat-note { color: var(--c-muted); font-size: 12px; line-height: 1.4; margin-top: 2px; }
+body.clinic .activity p,
+body.clinic #dashboard .activity p { font-size: 13px; line-height: 1.45; }
+body.clinic .chart-summary span { color: var(--c-muted); font-size: 12px; }
+body.clinic .legend { color: var(--c-muted); font-size: 12px; line-height: 1.45; }
+
+/* Kepala panel dan tautan kecil */
+body.clinic .panel-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+body.clinic .panel-heading h2 { margin: 0 0 4px; font-size: 18px; font-weight: 600; line-height: 1.3; }
+body.clinic .panel-heading p { margin: 0; color: var(--c-muted); font-size: 13px; line-height: 1.45; }
+body.clinic .small-link { color: var(--c-brand); font-size: 13px; font-weight: 500; text-decoration: none; white-space: nowrap; }
+body.clinic .small-link:hover { color: var(--c-brand-deep); text-decoration: underline; text-underline-offset: 2px; }
+
+/* Tombol logistik */
+body.clinic .button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 40px;
+    padding: 0 16px;
+    border: 1px solid transparent;
+    border-radius: var(--c-r-md);
+    background: var(--c-brand-solid);
+    color: var(--c-on-brand);
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+}
+body.clinic .button:hover { background: var(--c-brand-solid-hover); }
+body.clinic .button-secondary { background: var(--c-surface); color: var(--c-ink); border-color: var(--c-border-strong); }
+body.clinic .button-secondary:hover { background: var(--c-surface-muted); }
+
+/* Kartu data */
+body.clinic .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(232px, 1fr)); gap: 12px; }
+body.clinic .data-card { padding: 16px; background: transparent; border: 1px solid var(--c-border); border-radius: var(--c-r-md); }
+body.clinic .data-card.is-low { border-left: 3px solid var(--c-warning-rail); }
+body.clinic .data-card.is-empty { border-left-color: var(--c-critical); }
+body.clinic .data-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 4px; }
+body.clinic .data-card-top h3 { margin: 0; font-size: 15px; font-weight: 600; line-height: 1.35; }
+body.clinic .data-card-sub { margin: 0; color: var(--c-muted); font-size: 13px; }
+body.clinic .data-card-meta { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; margin-top: 12px; }
+body.clinic .data-card-meta > div { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+body.clinic .data-card-meta span { color: var(--c-muted); font-size: 12px; }
+body.clinic .data-card-meta b { color: var(--c-ink); font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; overflow-wrap: normal; }
+body.clinic .data-card-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--c-border); }
+body.clinic .data-card-empty { margin: 0; padding: 28px 16px; color: var(--c-muted); font-size: 14px; text-align: center; border: 1px dashed var(--c-border); border-radius: var(--c-r-md); }
+
+/* Daftar baris data */
+body.clinic .data-list { display: grid; }
+body.clinic .data-row { display: grid; grid-template-columns: 92px minmax(0, 1fr) auto; align-items: center; gap: 16px; padding: 12px 0; border-top: 1px solid var(--c-border); }
+body.clinic .data-row:first-child { border-top: 0; }
+body.clinic .data-row time { color: var(--c-muted); font-family: var(--c-mono); font-size: 12px; }
+body.clinic .data-row p { margin: 2px 0 0; color: var(--c-muted); font-size: 13px; }
+body.clinic .data-row-amount { display: flex; align-items: center; gap: 10px; font-size: 13px; font-variant-numeric: tabular-nums; }
+
+/* Aktivitas */
+body.clinic .activity-list { display: grid; }
+body.clinic .activity { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-top: 1px solid var(--c-border); }
+body.clinic .activity:first-child { border-top: 0; }
+body.clinic .activity-icon { display: none; }
+body.clinic .activity .badge { margin-left: auto; align-self: flex-start; flex: 0 0 auto; }
+body.clinic .activity strong { font-size: 14px; font-weight: 600; }
+body.clinic .activity p { margin: 2px 0 0; color: var(--c-muted); font-size: 13px; }
+
+/* Formulir */
+body.clinic .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 16px; }
+body.clinic .form-grid .full { grid-column: 1 / -1; }
+body.clinic .form-group { display: grid; gap: 6px; min-width: 0; }
+body.clinic .form-group label { color: var(--c-ink); font-size: 13px; font-weight: 500; }
+body.clinic .form-group input,
+body.clinic .form-group select,
+body.clinic .form-group textarea {
+    width: 100%;
+    min-height: 40px;
+    padding: 0 12px;
+    background: var(--c-surface);
+    color: var(--c-ink);
+    border: 1px solid var(--c-border-strong);
+    border-radius: var(--c-r-md);
+    font-family: inherit;
+    font-size: 14px;
+}
+body.clinic .form-group textarea { min-height: 84px; padding: 10px 12px; line-height: 1.5; }
+body.clinic .form-group input:focus,
+body.clinic .form-group select:focus,
+body.clinic .form-group textarea:focus { outline: 3px solid var(--c-focus); outline-offset: 2px; border-color: var(--c-focus); }
+body.clinic .form-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+
+/* Grafik batang */
+body.clinic .chart { display: flex; align-items: flex-end; gap: 10px; height: 150px; margin-top: 16px; }
+body.clinic .bar-group { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 6px; height: 100%; }
+body.clinic .bar { width: 100%; max-width: 36px; min-height: 2px; border-radius: 4px 4px 0 0; background: var(--c-brand); }
+body.clinic .bar-group span { color: var(--c-muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+body.clinic .bar-value { color: var(--c-ink); font-family: var(--c-mono); font-size: 11px; font-weight: 500; font-variant-numeric: tabular-nums; }
+body.clinic .chart-summary { display: flex; align-items: baseline; gap: 8px; }
+body.clinic .chart-summary strong { font-size: 24px; font-weight: 600; font-variant-numeric: tabular-nums; }
+body.clinic .chart-summary span { color: var(--c-muted); font-size: 13px; }
+body.clinic .legend { margin-top: 12px; color: var(--c-muted); font-size: 13px; }
+
+/* Progres persiapan */
+body.clinic .progress-item { display: grid; gap: 6px; padding: 12px 0; border-top: 1px solid var(--c-border); }
+body.clinic .progress-item:first-child { border-top: 0; }
+body.clinic .progress-title { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; font-weight: 500; }
+body.clinic .progress-track { height: 6px; border-radius: 999px; background: var(--c-surface-muted); overflow: hidden; }
+body.clinic .progress-fill { height: 100%; border-radius: 999px; background: var(--c-brand); }
+body.clinic .progress-fill[data-tone="success"] { background: var(--c-success); }
+body.clinic .progress-fill[data-tone="neutral"] { background: var(--c-border-strong); }
+body.clinic .progress-fill[data-tone="warning"] { background: var(--c-warning-rail); }
+body.clinic .progress-fill[data-tone="danger"] { background: var(--c-critical); }
+
+/* Chip */
+body.clinic .rd-chip { display: inline-flex; align-items: baseline; gap: 6px; padding: 4px 10px; color: var(--c-muted); border: 1px solid var(--c-border); border-radius: 999px; font-size: 12px; }
+body.clinic .rd-chip b { color: var(--c-ink); font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+@media (max-width: 900px) {
+    body.clinic .stats,
+    body.clinic #dashboard .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    body.clinic .stat-card:nth-child(2n) { border-left: 1px solid var(--c-border); }
+    body.clinic .stat-card:nth-child(n+3) { border-top: 1px solid var(--c-border); }
+    body.clinic .stat-card:nth-child(odd) { border-left: 0; }
+    body.clinic .form-grid { grid-template-columns: minmax(0, 1fr); }
+    body.clinic .data-row { grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; }
+    body.clinic .data-row time { grid-column: 1 / -1; }
+}
+
+/* ---------- 19. Laci navigasi ponsel ---------- */
+
+body.clinic .nav-toggle { display: none; }
+body.clinic .sidebar-scrim { display: none; }
+
+/* ---------- 20. Halaman preferensi: tema, sakelar, foto profil ---------- */
+
+body.clinic .theme-options {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+}
+
+body.clinic .theme-option {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+    justify-items: stretch;
+    min-height: 44px;
+    padding: 12px;
+    background: var(--c-surface);
+    color: var(--c-ink);
+    border: 1px solid var(--c-border-strong);
+    border-radius: var(--c-r-md);
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+body.clinic .theme-option:hover { border-color: var(--c-brand); background: var(--c-brand-tint); }
+body.clinic .theme-option[aria-pressed="true"] {
+    background: var(--c-brand-tint);
+    border-color: var(--c-brand);
+    box-shadow: inset 0 0 0 1px var(--c-brand);
+}
+body.clinic .theme-option strong { color: var(--c-ink); font-size: 13px; font-weight: 600; }
+body.clinic .theme-option small { color: var(--c-muted); font-size: 12px; line-height: 1.45; }
+
+body.clinic .theme-swatch {
+    width: 100%;
+    height: 28px;
+    border: 1px solid var(--c-border);
+    border-radius: var(--c-r-sm);
+    background: var(--c-surface-muted);
+}
+body.clinic .theme-swatch.light { background: linear-gradient(90deg, #F4F6F7 50%, #0A6C85 50%); }
+body.clinic .theme-swatch.dark { background: linear-gradient(90deg, #141E22 50%, #4FB3CC 50%); }
+body.clinic .theme-swatch.original { background: linear-gradient(90deg, #111411 50%, #B6D99A 50%); }
+
+body.clinic .pref {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 0;
+    border-top: 1px solid var(--c-border);
+}
+body.clinic .panel-head + .pref,
+body.clinic .pref:first-of-type { border-top: 0; }
+body.clinic .pref strong { color: var(--c-ink); font-size: 13px; font-weight: 600; }
+body.clinic .pref p { margin: 3px 0 0; color: var(--c-muted); font-size: 13px; line-height: 1.45; }
+body.clinic .pref .btn { flex: 0 0 auto; }
+
+body.clinic .switch {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0;
+    cursor: pointer;
+}
+body.clinic .switch span { width: 40px; height: 22px; border-radius: 999px; }
+body.clinic .switch span:after { width: 16px; height: 16px; top: 2px; left: 2px; }
+body.clinic .switch input:checked + span:after { left: 20px; }
+
+body.clinic .profile-photo-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--c-border);
+}
+body.clinic .profile-photo {
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    width: 56px;
+    height: 56px;
+    background: var(--c-brand-tint);
+    color: var(--c-brand-deep);
+    border: 1px solid var(--c-border);
+    border-radius: 50%;
+    font-size: 20px;
+    font-weight: 600;
+}
+body.clinic .profile-photo-meta { display: grid; gap: 2px; }
+body.clinic .profile-photo-meta strong { color: var(--c-ink); font-size: 14px; font-weight: 600; }
+body.clinic .profile-photo-meta small { color: var(--c-muted); font-size: 13px; line-height: 1.45; }
+
+body.clinic .alert {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin: 0;
+    padding: 12px 14px;
+    background: var(--c-surface-muted);
+    color: var(--c-ink);
+    border: 1px solid var(--c-border);
+    border-radius: var(--c-r-md);
+    font-size: 13px;
+    line-height: 1.5;
+}
+body.clinic .alert-info {
+    background: var(--c-brand-tint);
+    color: var(--c-brand-deep);
+    border-color: var(--c-brand);
+}
+
+@media (max-width: 900px) {
+    body.clinic .app,
+    body.clinic .app.layout { grid-template-columns: minmax(0, 1fr); }
+
+    body.clinic .topbar { gap: 8px; }
+
+    body.clinic .nav-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        flex: 0 0 auto;
+        min-height: 44px;
+        padding: 0 14px 0 12px;
+        background: var(--c-surface);
+        color: var(--c-ink);
+        border: 1px solid var(--c-border-strong);
+        border-radius: var(--c-r-md);
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 500;
+        line-height: 1;
+        cursor: pointer;
+    }
+    body.clinic .nav-toggle:hover,
+    body.clinic .nav-toggle[aria-expanded="true"] {
+        color: var(--c-brand-deep);
+        background: var(--c-brand-tint);
+        border-color: var(--c-brand);
+    }
+    body.clinic .nav-toggle svg {
+        width: 18px;
+        height: 18px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.7;
+        stroke-linecap: round;
+    }
+
+    /* Sidebar menjadi laci di luar layar; hanya aktif bila skrip laci siap */
+    body.clinic.nav-ready .sidebar {
+        position: fixed;
+        width: min(288px, calc(100vw - 2 * var(--sb-gap)));
+        height: auto;
+        max-height: calc(100vh - 2 * var(--sb-gap));
+        overflow-y: auto;
+        padding: 18px 16px;
+        background: var(--c-surface);
+        border: 1px solid var(--c-border);
+        border-radius: var(--c-r-lg);
+        box-shadow: 0 12px 40px rgba(22, 38, 46, .22);
+        transform: translateX(calc(-100% - 2 * var(--sb-gap)));
+        transition: transform 220ms cubic-bezier(.2, 0, 0, 1);
+        z-index: 70;
+    }
+    body.clinic.nav-ready.nav-open .sidebar { transform: translateX(0); }
+
+    body.clinic .sidebar-scrim {
+        display: block;
+        position: fixed;
+        inset: 0;
+        z-index: 65;
+        background: var(--c-scrim);
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 200ms cubic-bezier(.2, 0, 0, 1), visibility 200ms;
+    }
+    body.clinic.nav-open .sidebar-scrim { opacity: 1; visibility: visible; }
+
+    body.clinic.nav-open { overflow: hidden; }
+
+    body.clinic .sidebar-toggle { display: none; }
+
+    body.clinic .main { padding: 16px 16px 32px; }
+    body.clinic .crumb { display: none; }
+}
+
+@media (max-width: 560px) {
+    body.clinic .theme-options { grid-template-columns: minmax(0, 1fr); }
+    body.clinic .pref { align-items: flex-start; }
+    body.clinic .profile-photo-row { gap: 12px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    body.clinic.nav-ready .sidebar,
+    body.clinic .sidebar-scrim { transition: none; }
+}
+
+/* ---------- 21. Penyelarasan halaman ber-.layout ----------
+   role-pages.css masih membawa kulit lama (sidebar 26px, judul 20px, glow radial).
+   Blok ini menyamakan halaman logistik, ahli gizi, dan waiter dengan halaman lain. */
+
+body.clinic::before { content: none; }
+
+body.clinic .app.layout { grid-template-columns: 248px minmax(0, 1fr); }
+body.clinic .app.layout > .main { padding: 24px 32px 40px; max-width: 1440px; }
+
+body.clinic .app.layout > .sidebar {
+    padding: 20px 16px;
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-radius: var(--c-r-lg);
+    box-shadow: none;
+}
+
+body.clinic .app.layout > .sidebar .brand { padding: 0 8px 18px; border-bottom: 1px solid var(--c-border); }
+body.clinic .app.layout > .sidebar .brand::after { content: none; }
+body.clinic .app.layout > .sidebar .brand-logo { width: 30px; height: 30px; }
+body.clinic .app.layout > .sidebar .brand-name { color: var(--c-ink); font-size: 15px; font-weight: 600; letter-spacing: 0; }
+body.clinic .app.layout > .sidebar .brand-name span { color: var(--c-brand); }
+body.clinic .app.layout > .sidebar .brand small { color: var(--c-muted); font-size: 11px; letter-spacing: 0; }
+
+body.clinic .app.layout > .sidebar .sidebar-date {
+    display: block;
+    margin: 14px 0 4px;
+    padding: 8px;
+    background: var(--c-surface-muted);
+    border-radius: var(--c-r-sm);
+    color: var(--c-muted);
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0;
+    text-transform: none;
+}
+
+body.clinic .app.layout > .sidebar .nav-title {
+    margin: 18px 8px 8px;
+    padding: 0;
+    color: var(--c-muted);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0;
+    text-transform: none;
+}
+
+/* Menu sidebar satu kolom: label panjang tidak terlipat dua baris */
+body.clinic .app.layout > .sidebar .nav {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+body.clinic .app.layout > .sidebar .nav-link { width: 100%; }
+
+body.clinic .app.layout > .sidebar .menu-label {
+    margin: 18px 8px 8px;
+    padding: 0;
+    color: var(--c-muted);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0;
+    text-transform: none;
+}
+
+body.clinic .app.layout > .sidebar .nav-link {
+    min-height: 40px;
+    gap: 10px;
+    padding: 9px 10px;
+    color: var(--c-ink);
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: var(--c-r-md);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0;
+}
+body.clinic .app.layout > .sidebar .nav-link:hover { color: var(--c-ink); background: var(--c-surface-muted); }
+body.clinic .app.layout > .sidebar .nav-link.active {
+    color: var(--c-brand-deep);
+    background: var(--c-brand-tint);
+    font-weight: 600;
+    box-shadow: none;
+}
+body.clinic .app.layout > .sidebar .nav-icon { width: 18px; height: 18px; }
+body.clinic .app.layout > .sidebar .nav-icon svg { width: 18px; height: 18px; }
+
+@media (max-width: 900px) {
+    body.clinic .app.layout > .main { padding: 16px 16px 32px; }
+}
+
+/* Kolom sidebar dilepas di layar sempit; aturan ini harus menang atas bagian 21 */
+@media (max-width: 900px) {
+    body.clinic .app,
+    body.clinic .app:not(.layout),
+    body.clinic .app.layout { grid-template-columns: minmax(0, 1fr); }
+    body.clinic .app.layout { padding: 0; }
+    body.clinic .app.layout > .main { padding: 16px 16px 32px; }
+}
+
+/* Panel di dalam #dashboard masih membawa sudut 18px dari role-pages */
+body.clinic #dashboard .panel,
+body.clinic .app.layout #dashboard .panel { border-radius: var(--c-r-lg); }
+body.clinic .modal-card { border-radius: var(--c-r-lg); }
+
+/* ---------- 22. Sidebar terlipat ----------
+   Tombol lipat lama menyembunyikan label dengan font-size 0, tetapi aturan
+   ber-`body.clinic[data-theme]` di berkas ini punya kekhususan lebih tinggi,
+   jadi label tetap tampil di sidebar selebar 84px dan menimpa ikon.
+   Blok ini mengembalikan keadaan terlipat secara utuh di semua halaman. */
+
+@media (min-width: 901px) {
+    /* Kolom mengikuti lebar sidebar, terbuka maupun terlipat */
+    body.clinic .app:not(.layout),
+    body.clinic .app.layout { grid-template-columns: calc(var(--sb-w) + var(--sb-gap)) minmax(0, 1fr); }
+
+    body.clinic .app.is-collapsed .sidebar,
+    body.clinic .app.layout.is-collapsed > .sidebar { padding: 20px 10px 18px; }
+
+    body.clinic .app.is-collapsed .sidebar .brand,
+    body.clinic .app.layout.is-collapsed > .sidebar .brand {
+        justify-content: center;
+        padding: 4px 0 14px;
+        border-bottom: 1px solid var(--c-border);
+    }
+    body.clinic .app.is-collapsed .sidebar .brand > div,
+    body.clinic .app.layout.is-collapsed > .sidebar .brand > div { display: none; }
+
+    body.clinic .app.is-collapsed .sidebar .sidebar-date,
+    body.clinic .app.layout.is-collapsed > .sidebar .sidebar-date { display: none; }
+
+    body.clinic .app.is-collapsed .sidebar .nav-title,
+    body.clinic .app.is-collapsed .sidebar .menu-label,
+    body.clinic .app.layout.is-collapsed > .sidebar .menu-label {
+        margin: 14px 0 8px;
+        padding: 0 0 8px;
+        font-size: 0;
+        line-height: 0;
+        border-bottom: 1px solid var(--c-border);
+    }
+    body.clinic .app.is-collapsed .sidebar .nav-title::after,
+    body.clinic .app.layout.is-collapsed > .sidebar .menu-label::after { content: none; }
+
+    body.clinic .app.is-collapsed .sidebar .nav-link,
+    body.clinic .app.layout.is-collapsed > .sidebar .nav-link {
+        width: 100%;
+        min-height: 40px;
+        justify-content: center;
+        gap: 0;
+        padding: 11px 0;
+        font-size: 0;
+        line-height: 0;
+        letter-spacing: 0;
+        white-space: nowrap;
+    }
+
+    body.clinic .app.is-collapsed .sidebar .nav-link .nav-icon,
+    body.clinic .app.layout.is-collapsed > .sidebar .nav-link .nav-icon {
+        width: 18px;
+        height: 18px;
+        flex: 0 0 18px;
+    }
+}
+
+/* Halaman ber-.layout tidak memuat dashboard.css, jadi tombol lipat di sana
+   kehilangan position: fixed dan jatuh menempel di pojok kiri bawah. */
+@media (min-width: 901px) {
+    body.clinic .app.layout > .sidebar-toggle {
+        position: fixed;
+        top: auto;
+        bottom: calc(var(--sb-gap) + 18px);
+        left: calc(var(--sb-gap) + 16px);
+        transform: none;
+        display: grid;
+        place-items: center;
+        width: 26px;
+        height: 26px;
+        color: var(--c-muted);
+        background: var(--c-surface);
+        border: 1px solid var(--c-border);
+        border-radius: var(--c-r-md);
+        box-shadow: none;
+        z-index: 45;
+    }
+    body.clinic .app.layout > .sidebar-toggle:hover {
+        color: var(--c-brand-deep);
+        background: var(--c-brand-tint);
+        border-color: var(--c-brand);
+    }
+
+    /* Saat terlipat, tombol ikut di tengah kaki sidebar */
+    body.clinic .app.is-collapsed .sidebar-toggle,
+    body.clinic .app.layout.is-collapsed > .sidebar-toggle {
+        left: calc(var(--sb-gap) + var(--sb-w) / 2 - 13px);
+    }
+}
+
+/* Di layar sempit sidebar tampil sebagai laci 288px; status terlipat dari
+   desktop tidak boleh ikut menyembunyikan label di dalam laci. */
+@media (max-width: 900px) {
+    body.clinic .app.is-collapsed .sidebar,
+    body.clinic .app.layout.is-collapsed > .sidebar { padding: 20px 16px; }
+
+    body.clinic .app.is-collapsed .sidebar .brand,
+    body.clinic .app.layout.is-collapsed > .sidebar .brand {
+        justify-content: flex-start;
+        padding: 0 8px 18px;
+    }
+    body.clinic .app.is-collapsed .sidebar .brand > div,
+    body.clinic .app.layout.is-collapsed > .sidebar .brand > div { display: block; }
+
+    body.clinic .app.is-collapsed .sidebar .sidebar-date,
+    body.clinic .app.layout.is-collapsed > .sidebar .sidebar-date { display: block; }
+
+    body.clinic .app.is-collapsed .sidebar .nav-title,
+    body.clinic .app.is-collapsed .sidebar .menu-label,
+    body.clinic .app.layout.is-collapsed > .sidebar .menu-label {
+        margin: 18px 8px 8px;
+        padding: 0;
+        font-size: 12px;
+        line-height: 1.4;
+        border-bottom: 0;
+    }
+
+    body.clinic .app.is-collapsed .sidebar .nav-link,
+    body.clinic .app.layout.is-collapsed > .sidebar .nav-link {
+        min-height: 40px;
+        justify-content: flex-start;
+        gap: 10px;
+        padding: 9px 10px;
+        font-size: 13px;
+        line-height: 1.4;
+    }
+    body.clinic .app.is-collapsed .sidebar .nav-link .nav-icon,
+    body.clinic .app.layout.is-collapsed > .sidebar .nav-link .nav-icon { flex: 0 0 18px; }
+}

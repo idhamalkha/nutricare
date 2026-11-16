@@ -1,0 +1,74 @@
+(function () {
+    'use strict';
+    var roles = {
+        'ahli-gizi': { label: 'Ahli Gizi', avatar: 'G', dashboard: 'ahli-gizi.html' },
+        logistik: { label: 'Logistik & Kepala Dapur', avatar: 'L', dashboard: 'logistik.html' },
+        perawat: { label: 'Perawat ruangan', avatar: 'P', dashboard: 'perawat.html' },
+        waiter: { label: 'Petugas distribusi', avatar: 'W', dashboard: 'waiter.html' }
+    };
+    var params = new URLSearchParams(window.location.search);
+    var roleKey = params.get('role');
+    if (!Object.prototype.hasOwnProperty.call(roles, roleKey)) roleKey = 'ahli-gizi';
+    var role = roles[roleKey];
+    var authToken = sessionStorage.getItem('nutricare-token');
+    var headers = authToken ? { Authorization: 'Bearer ' + authToken } : { 'X-NC-Role': roleKey };
+    var title = document.getElementById('theme-msg');
+    document.title = 'Pengaturan ' + role.label + ' | NutriCare';
+    document.querySelectorAll('[data-role-label]').forEach(function (el) { el.textContent = role.label; });
+    document.querySelector('[data-role-avatar]').textContent = role.avatar;
+    document.getElementById('pf-jabatan').value = role.label;
+    document.querySelector('[data-back-link]').href = role.dashboard;
+    window.NC.setTheme(localStorage.getItem('nutricare-theme') || 'original');
+    window.NC.today();
+
+    document.querySelectorAll('[data-theme-choice]').forEach(function (button) {
+        button.addEventListener('click', function () {
+            var theme = window.NC.setTheme(button.getAttribute('data-theme-choice'));
+            title.textContent = 'Tema ' + (theme === 'light' ? 'terang' : (theme === 'dark' ? 'gelap' : 'original')) + ' diterapkan dan disimpan pada browser.';
+        });
+    });
+
+    function markUnavailable(control, message) {
+        if (control) control.disabled = true;
+        var note = document.createElement('p');
+        note.className = 'form-msg';
+        note.setAttribute('role', 'status');
+        note.textContent = message;
+        control && control.closest('form') ? control.closest('form').appendChild(note) : document.getElementById('pref-msg').appendChild(note);
+    }
+    async function loadAccount() {
+        try {
+            var responses = await Promise.all([
+                fetch('/api/me', { headers: headers }),
+                fetch('/api/me/preferensi', { headers: headers })
+            ]);
+            if (!responses[0].ok || !responses[1].ok) throw new Error('Data akun belum tersedia dari server.');
+            var user = await responses[0].json();
+            var prefs = await responses[1].json();
+            document.querySelectorAll('[data-user-name]').forEach(function (el) { el.textContent = user.nama || role.label; });
+            document.getElementById('pf-nama').value = user.nama || '';
+            document.getElementById('pf-email').value = user.email || '';
+            document.getElementById('pf-telepon').value = user.telepon || '';
+            document.querySelectorAll('[data-pref]').forEach(function (input) { input.checked = Boolean(prefs[input.getAttribute('data-pref')]); });
+            var profileForm = document.getElementById('form-profil');
+            var passwordForm = document.getElementById('form-sandi');
+            if (profileForm) profileForm.querySelectorAll('input,button').forEach(function (el) { if (!el.readOnly) el.disabled = true; });
+            if (passwordForm) passwordForm.querySelectorAll('input,button').forEach(function (el) { el.disabled = true; });
+            document.querySelectorAll('[data-pref]').forEach(function (input) { input.disabled = true; });
+            document.getElementById('pref-msg').textContent = 'Preferensi dibaca dari API. Penyimpanan tidak tersedia untuk mode demo.';
+            var authNotice = document.querySelector('#auth-notice span');
+            if (authNotice) authNotice.textContent = 'Profil berhasil dimuat dari API; perubahan akun belum tersedia pada sesi demo.';
+            var themeStatus = document.getElementById('theme-msg');
+            if (themeStatus) themeStatus.textContent = 'Preferensi tampilan disimpan pada browser ini.';
+        } catch (error) {
+            document.getElementById('pref-msg').textContent = error.message || 'Data akun gagal dimuat.';
+            document.getElementById('form-profil').querySelectorAll('input,button').forEach(function (el) { if (!el.readOnly) el.disabled = true; });
+            document.getElementById('form-sandi').querySelectorAll('input,button').forEach(function (el) { el.disabled = true; });
+        }
+    }
+    var reset = document.getElementById('reset-demo');
+    reset.disabled = true;
+    reset.title = 'Reset demo dinonaktifkan sampai alur reset dan seed atomik tersedia.';
+    reset.addEventListener('click', function () { document.getElementById('pref-msg').textContent = 'Reset data demo dinonaktifkan untuk melindungi data server.'; });
+    loadAccount();
+})();

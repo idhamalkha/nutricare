@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <script src="../js/auth-guard.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Ahli Gizi | NutriCare</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/loading.css">
+    <link rel="stylesheet" href="../css/notifications.css">
+    <link rel="stylesheet" href="../css/notifications-center.css">
+    <link rel="stylesheet" href="../css/profile-dropdown.css">
+    <link rel="stylesheet" href="../css/role-pages.css">
+    <link rel="stylesheet" href="../css/hms-clinic.css">
+    <link rel="icon" href="/favicon.ico?v=1" type="image/x-icon">
+</head>
+<body class="clinic">
+
+<div class="app">
+
+    <!-- ===================== SIDEBAR ===================== -->
+    <aside class="sidebar">
+
+        <a href="#dashboard" class="brand" aria-label="NutriCare Ahli Gizi">
+            <img class="brand-mark brand-logo" src="../assets/images/logo/legos-transparent.png" alt="">
+            <div>
+                <div class="brand-name">Nutri<span>Care</span></div>
+                <small>Ahli Gizi</small>
+            </div>
+        </a>
+
+        <!-- Tanggal dipindahkan ke sini -->
+        <div class="sidebar-date today"></div>
+
+        <div class="nav-title">Menu ahli gizi</div>
+
+        <nav class="nav" aria-label="Menu ahli gizi">
+            <a href="#dashboard" class="nav-link"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg></span> Dashboard</a>
+            <a href="#pasien" class="nav-link"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"></circle><path d="M3.5 20a5.5 5.5 0 0 1 11 0"></path><path d="M16 5.6a3 3 0 0 1 0 5.6"></path><path d="M17.6 14.3a5 5 0 0 1 3 4.7"></path></svg></span> Data pasien &amp; pantangan</a>
+            <a href="#rekomendasi" class="nav-link"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v7a2 2 0 0 0 4 0V3"></path><path d="M8 10v11"></path><path d="M16 3c2 1.5 3 3.6 3 6 0 2-1 3.4-3 4v8"></path></svg></span> Rekomendasi menu</a>
+            <a href="#jadwal" class="nav-link"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5V12l3 2"></path></svg></span> Jadwal makan</a>
+            <a href="#perawat" class="nav-link"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4.5" width="14" height="16" rx="2"></rect><path d="M9 4.5V3.8A1.3 1.3 0 0 1 10.3 2.5h3.4A1.3 1.3 0 0 1 15 3.8v.7z"></path><path d="M8.5 11h7"></path><path d="M8.5 15h4"></path></svg></span> Informasi perawat</a>
+            <a href="#bahan" class="nav-link"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5 12 3l8.5 4.5v9L12 21l-8.5-4.5z"></path><path d="M3.5 7.5 12 12l8.5-4.5"></path><path d="M12 12v9"></path></svg></span> Ketersediaan bahan</a>
+            <a href="#riwayat" class="nav-link"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M3.8 12a8.2 8.2 0 1 0 2.6-6"></path><path d="M3.5 4.5V9H8"></path><path d="M12 8v4.5l3 1.8"></path></svg></span> Riwayat rekomendasi</a>
+            <a href="#laporan" class="nav-link"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v16h16"></path><rect x="7.5" y="12" width="3" height="5"></rect><rect x="13" y="8.5" width="3" height="8.5"></rect></svg></span> Laporan dan grafik</a>
+        </nav>
+
+    </aside>
+
+    <!-- ===================== KONTEN ===================== -->
+    <main class="main">
+
+        <header class="topbar">
+            <div class="crumb">NutriCare / Ahli Gizi / <strong id="crumb-page">Dashboard</strong></div>
+            
+            <!-- Area kosong di tengah -->
+            
+            <!-- Notification Bell & Profile Dropdown (pojok kanan) -->
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <!-- Notification Bell -->
+                <div class="notification-center">
+                    <button id="notification-bell" class="notification-bell" aria-label="Notifikasi">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                        </svg>
+                        <span id="notification-badge" class="notification-badge" style="display: none;"></span>
+                    </button>
+                    <div id="notification-dropdown" class="notification-dropdown">
+                        <div class="notification-header">
+                            <h3>Notifikasi</h3>
+                            <span id="notification-count" class="notification-count" hidden></span>
+                            <div class="notification-actions">
+                                <button id="mark-all-read" class="notification-action-btn">Tandai sudah dibaca</button>
+                                <button id="clear-all-notifications" class="notification-action-btn">Hapus semua</button>
+                            </div>
+                        </div>
+                        <div id="notification-list" class="notification-list">
+                            <div class="notification-empty">
+                                <div class="notification-empty-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg></div>
+                                <div class="notification-empty-text">Tidak ada notifikasi</div>
+                            </div>
+                        </div>
+                        <p class="notification-hint">Klik notifikasi untuk melihat rinciannya.</p>
+                    </div>
+                </div>
+                
+                <!-- Profile Dropdown -->
+                <div style="position: relative;">
+                    <button id="profile-trigger" class="profile-trigger" aria-haspopup="menu" aria-expanded="false">
+                        <div class="avatar" data-role-avatar>G</div>
+                        <div class="profile-info">
+                            <div class="profile-name" data-user-name>ahli gizi</div>
+                            <div class="profile-role">Ahli Gizi</div>
+                        </div>
+                        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </button>
+                    
+                    <div id="profile-dropdown" class="profile-dropdown" role="menu">
+                        <a href="profil.html" class="profile-dropdown-item" role="menuitem">
+                            <svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                            <span>Profil</span>
+                        </a>
+                        <a href="pengaturan.html?role=ahli-gizi" class="profile-dropdown-item" role="menuitem">
+                            <svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <path d="M12 1v6m0 6v6m-5-13.66L9.5 8.5m8.66 3.5l-3.16 3.16m3.16 3.16L14.5 15.5M5.34 5.34L8.5 8.5M1 12h6m6 0h6"></path>
+                            </svg>
+                            <span>Pengaturan</span>
+                        </a>
+                        <div class="profile-dropdown-divider"></div>
+                        <button id="logout-btn" class="profile-dropdown-item danger" role="menuitem">
+                            <svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                <polyline points="16 17 21 12 16 7"></polyline>
+                                <line x1="21" y1="12" x2="9" y2="12"></line>
+                            </svg>
+                            <span>Keluar</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- ---------- DASHBOARD ---------- -->
+        <section class="page" id="dashboard" data-title="Dashboard">
+            <div class="page-head">
+                <div>
+                    <h1>Dashboard</h1>
+                    <p id="g-summary">Ringkasan pasien, rekomendasi menu, dan jadwal makan.</p>
+                </div>
+                <div class="page-head-actions">
+                    <a href="#jadwal" class="text-link">Kelola jadwal makan</a>
+                    <a href="#rekomendasi" class="btn">Buat rekomendasi</a>
+                </div>
+            </div>
+
+            <p class="clinic-section-label">Ringkasan hari ini</p>
+            <div class="ledger">
+                <div class="ledger-cell"><div class="ledger-label">Total pasien</div><div class="ledger-value" id="d-pasien">0</div><div class="ledger-note">Pasien terdata</div></div>
+                <div class="ledger-cell"><div class="ledger-label">Rekomendasi menu</div><div class="ledger-value" id="d-rekom">0</div><div class="ledger-note">Seluruh riwayat</div></div>
+                <div class="ledger-cell"><div class="ledger-label">Alergi tercatat</div><div class="ledger-value" id="d-alergi">0</div><div class="ledger-note">Pasien dengan alergi</div></div>
+                <div class="ledger-cell"><div class="ledger-label">Perlu evaluasi</div><div class="ledger-value" id="d-evaluasi">0</div><div class="ledger-note bad">Perlu tindak lanjut</div></div>
+            </div>
+
+            <div class="grid-wide">
+                <section class="panel">
+                    <div class="panel-head">
+                        <div><h2>Pasien terbaru</h2><p>Lima pasien yang terakhir ditambahkan.</p></div>
+                        <a href="#pasien" class="text-link">Lihat semua</a>
+                    </div>
+                    <div class="table-wrap" id="d-tabel"></div>
+                </section>
+
+                <section class="panel">
+                    <div class="panel-head">
+                        <div><h2>Perhatian khusus</h2><p id="d-perhatian-sub">Dihitung dari data pasien dan stok.</p></div>
+                    </div>
+                    <div id="d-perhatian"></div>
+                </section>
+            </div>
+
+            <section class="panel" style="margin-top:22px">
+                <div class="panel-head">
+                    <div><h2>Jadwal makan hari ini</h2><p>Jumlah pasien terjadwal pada setiap waktu makan.</p></div>
+                    <a href="#jadwal" class="text-link">Kelola jadwal</a>
+                </div>
+                <div class="slots" id="d-slots"></div>
+            </section>
+        </section>
+        <!-- ---------- DATA PASIEN & PANTANGAN (HANYA BACA) ---------- -->
+        <section class="page" id="pasien" data-title="Data pasien & pantangan">
+            <div class="page-head">
+                <div>
+                    <h1>Data pasien &amp; pantangan</h1>
+                    <p>Identitas pasien, kebutuhan nutrisi, serta pantangan dan alerginya dalam satu tabel. Buka detail untuk melihat seluruh data. Halaman ini hanya untuk dilihat.</p>
+                </div>
+            </div>
+
+            <div class="ledger">
+                <div class="ledger-cell"><div class="ledger-label">Pasien dengan alergi</div><div class="ledger-value" id="n-alergi">0</div><div class="ledger-note">Data alergi tercatat</div></div>
+                <div class="ledger-cell"><div class="ledger-label">Pasien berpantangan</div><div class="ledger-value" id="n-pantang">0</div><div class="ledger-note">Memiliki pembatasan diet</div></div>
+                <div class="ledger-cell"><div class="ledger-label">Belum dicatat</div><div class="ledger-value" id="n-belum">0</div><div class="ledger-note bad">Pasien tanpa data pantangan</div></div>
+            </div>
+
+            <section class="panel">
+                <div class="panel-head">
+                    <div><h2>Daftar pasien</h2><p>Pantangan dan alergi digabung per pasien. Data hanya dapat dilihat.</p></div>
+                </div>
+                <div id="crud-pasien"></div>
+            </section>
+        </section>
+        <!-- ---------- REKOMENDASI MENU ---------- -->
+        <section class="page" id="rekomendasi" data-title="Rekomendasi menu">
+            <div class="page-head">
+                <div>
+                    <h1>Rekomendasi menu</h1>
+                    <p>Tentukan menu sesuai kebutuhan nutrisi, diagnosis, dan pantangan pasien. Menu dicek terhadap alergi dan stok gudang.</p>
+                </div>
+            </div>
+
+            <section class="panel">
+                <div class="panel-head">
+                    <div><h2>Daftar rekomendasi</h2><p>Menu diambil dari resep dapur. Rekomendasi yang tanggalnya sudah lewat disembunyikan, kecuali dicari lewat tanggal.</p></div>
+                </div>
+                <div id="crud-rekom"></div>
+            </section>
+        </section>
+        <!-- ---------- JADWAL MAKAN ---------- -->
+        <section class="page" id="jadwal" data-title="Jadwal makan">
+            <div class="page-head">
+                <div>
+                    <h1>Jadwal makan</h1>
+                    <p>Atur jadwal makan pasien untuk sarapan, makan siang, makan malam, dan snack.</p>
+                </div>
+            </div>
+
+            <div class="ledger" id="j-ledger"></div>
+
+            <section class="panel">
+                <div class="panel-head">
+                    <div><h2>Daftar jadwal makanan</h2><p>Ruangan diambil dari data pasien.</p></div>
+                </div>
+                <div id="crud-jadwal"></div>
+            </section>
+        </section>
+        <!-- ---------- INFORMASI PERAWAT ---------- -->
+        <section class="page" id="perawat" data-title="Informasi perawat">
+            <div class="page-head">
+                <div>
+                    <h1>Informasi dari perawat</h1>
+                    <p>Tinjau pembaruan kondisi pasien sebagai bahan evaluasi kebutuhan nutrisi. Tandai setelah ditinjau.</p>
+                </div>
+            </div>
+
+            <div class="grid-wide">
+                <section class="panel">
+                    <div class="panel-head">
+                        <div><h2>Pembaruan kondisi pasien</h2><p>Laporan masuk dari perawat ruangan.</p></div>
+                    </div>
+                    <div id="crud-perawat"></div>
+                </section>
+
+                <section class="panel">
+                    <div class="panel-head">
+                        <div><h2>Perlu dievaluasi</h2><p>Catatan yang belum ditinjau.</p></div>
+                    </div>
+                    <div id="pr-notes"></div>
+                </section>
+            </div>
+        </section>
+        <!-- ---------- KETERSEDIAAN BAHAN ---------- -->
+        <section class="page" id="bahan" data-title="Ketersediaan bahan">
+            <div class="page-head">
+                <div>
+                    <h1>Ketersediaan bahan</h1>
+                    <p>Periksa dan kelola data stok bahan sebelum menentukan menu.</p>
+                </div>
+            </div>
+
+            <div class="ledger">
+                <div class="ledger-cell"><div class="ledger-label">Jenis bahan</div><div class="ledger-value" id="b-total">0</div><div class="ledger-note">Terdata di gudang</div></div>
+                <div class="ledger-cell"><div class="ledger-label">Stok aman</div><div class="ledger-value" id="b-aman">0</div><div class="ledger-note ok">Mencukupi</div></div>
+                <div class="ledger-cell"><div class="ledger-label">Perlu diperiksa</div><div class="ledger-value" id="b-menipis">0</div><div class="ledger-note">Menipis atau hampir kedaluwarsa</div></div>
+                <div class="ledger-cell"><div class="ledger-label">Tidak tersedia</div><div class="ledger-value" id="b-habis">0</div><div class="ledger-note bad">Habis atau kedaluwarsa</div></div>
+            </div>
+
+            <section class="panel">
+                <div class="panel-head">
+                    <div><h2>Stok bahan makanan</h2><p>Koordinasikan dengan logistik jika bahan tidak mencukupi.</p></div>
+                </div>
+                <div id="crud-bahan"></div>
+            </section>
+        </section>
+        <!-- ---------- RIWAYAT ---------- -->
+        <section class="page" id="riwayat" data-title="Riwayat rekomendasi">
+            <div class="page-head">
+                <div>
+                    <h1>Riwayat rekomendasi</h1>
+                    <p>Dokumentasi seluruh rekomendasi menu yang pernah dibuat untuk pasien.</p>
+                </div>
+                <button type="button" class="btn btn-ghost" onclick="window.print()">Cetak riwayat</button>
+            </div>
+
+            <section class="panel">
+                <div class="panel-head">
+                    <div><h2>Riwayat menu pasien</h2><p>Kelola riwayat rekomendasi dari tabel ini atau halaman rekomendasi menu.</p></div>
+                </div>
+                <div id="crud-riwayat"></div>
+            </section>
+        </section>
+        <!-- ---------- LAPORAN ---------- -->
+        <section class="page" id="laporan" data-title="Laporan dan grafik">
+            <div class="page-head">
+                <div>
+                    <h1>Laporan dan grafik</h1>
+                    <p>Ringkasan kebutuhan nutrisi, diet khusus, dan rekomendasi makanan yang dihitung dari data Anda.</p>
+                </div>
+                <button type="button" class="btn btn-ghost" id="ekspor-pasien">Unduh CSV pasien</button>
+            </div>
+
+            <div class="ledger">
+                <div class="ledger-cell"><div class="ledger-label">Total pasien</div><div class="ledger-value" id="l-pasien">0</div><div class="ledger-note">Pasien terdata</div></div>
+                <div class="ledger-cell"><div class="ledger-label">Rekomendasi</div><div class="ledger-value" id="l-rekom">0</div><div class="ledger-note">Menu dibuat</div></div>
+                <div class="ledger-cell"><div class="ledger-label">Diet khusus</div><div class="ledger-value" id="l-diet">0</div><div class="ledger-note">Rekomendasi non normal</div></div>
+                <div class="ledger-cell"><div class="ledger-label">Perlu evaluasi</div><div class="ledger-value" id="l-eval">0</div><div class="ledger-note bad">Perlu tindak lanjut</div></div>
+            </div>
+
+            <div class="grid-2">
+                <section class="panel">
+                    <div class="panel-head">
+                        <div><h2>Kebutuhan kalori pasien</h2><p>Jumlah pasien menurut rentang kalori.</p></div>
+                    </div>
+                    <div id="l-kalori"></div>
+                </section>
+
+                <section class="panel">
+                    <div class="panel-head">
+                        <div><h2>Rekap diet</h2><p>Jumlah rekomendasi menurut jenis diet.</p></div>
+                    </div>
+                    <div class="bars" id="l-diet-bars"></div>
+                </section>
+            </div>
+        </section>
+        <!-- ---------- PENGATURAN ---------- -->
+        <section class="page" id="pengaturan" data-title="Pengaturan">
+            <div class="page-head">
+                <div>
+                    <h1>Pengaturan</h1>
+                    <p>Kelola profil, kata sandi, dan pengingat untuk akun ahli gizi.</p>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <section class="panel">
+                    <div class="panel-head">
+                        <div><h2>Informasi profil</h2><p>Nama ini tampil di sisi kiri halaman.</p></div>
+                    </div>
+                    <form id="form-profil" novalidate>
+                        <div class="form-grid">
+                            <div class="field full"><label for="pf-nama">Nama lengkap</label><input id="pf-nama" name="nama" type="text"></div>
+                            <div class="field"><label for="pf-email">Email</label><input id="pf-email" name="email" type="email" placeholder="ahligizi@nutricare.com"></div>
+                            <div class="field"><label for="pf-telepon">Nomor telepon</label><input id="pf-telepon" name="telepon" type="tel" placeholder="08xxxxxxxxxx"></div>
+                            <div class="field full"><label for="pf-jabatan">Jabatan</label><input id="pf-jabatan" type="text" value="Ahli Gizi" readonly></div>
+                        </div>
+                        <div class="form-msg" role="alert"></div>
+                        <div class="form-actions"><button type="submit" class="btn">Simpan perubahan</button></div>
+                    </form>
+                </section>
+
+                <section class="panel">
+                    <div class="panel-head">
+                        <div><h2>Keamanan akun</h2><p>Gunakan minimal 8 karakter.</p></div>
+                    </div>
+                    <form id="form-sandi" novalidate>
+                        <div class="form-grid">
+                            <div class="field full"><label for="pw-lama">Kata sandi lama</label><input id="pw-lama" name="lama" type="password" autocomplete="current-password"></div>
+                            <div class="field"><label for="pw-baru">Kata sandi baru</label><input id="pw-baru" name="baru" type="password" autocomplete="new-password"></div>
+                            <div class="field"><label for="pw-ulang">Ulangi kata sandi baru</label><input id="pw-ulang" name="ulang" type="password" autocomplete="new-password"></div>
+                        </div>
+                        <div class="form-msg" role="alert"></div>
+                        <div class="form-actions"><button type="submit" class="btn">Perbarui kata sandi</button></div>
+                    </form>
+                </section>
+            </div>
+
+            <section class="panel" style="margin-top:22px">
+                <div class="panel-head">
+                    <div><h2>Pengingat</h2><p>Pilih pemberitahuan yang ingin Anda terima.</p></div>
+                </div>
+                <div class="pref"><div><strong>Pasien baru</strong><p>Beri tahu saat pasien baru ditambahkan.</p></div><label class="switch"><input type="checkbox" data-pref="pasien" aria-label="Pengingat pasien baru"><span></span></label></div>
+                <div class="pref"><div><strong>Pembaruan kondisi pasien</strong><p>Informasi terbaru dari perawat.</p></div><label class="switch"><input type="checkbox" data-pref="kondisi" aria-label="Pengingat kondisi pasien"><span></span></label></div>
+                <div class="pref"><div><strong>Stok bahan</strong><p>Beri tahu saat bahan makanan menipis.</p></div><label class="switch"><input type="checkbox" data-pref="stok" aria-label="Pengingat stok bahan"><span></span></label></div>
+            </section>
+
+            <section class="panel" style="margin-top:22px">
+                <div class="panel-head">
+                    <div><h2>Data demonstrasi</h2><p>Reset demo dinonaktifkan agar data server tidak berubah tanpa prosedur reset dan seed yang aman.</p></div>
+                    <button type="button" class="btn btn-ghost" id="reset-demo" disabled title="Reset demo dinonaktifkan demi keamanan data server">Reset demo dinonaktifkan</button>
+                </div>
+            </section>
+
+        </section>
+
+        <footer class="footer">
+            <span>© 2026 NutriCare, pelayanan gizi terpadu</span>
+            <span>Dashboard ahli gizi</span>
+        </footer>
+
+    </main>
+
+</div>
+
+<script src="../js/api-adapter.js"></script>
+<script src="../js/nutricare.js"></script>
+<script src="../js/ui-utils.js"></script>
+<script src="../js/api-wrapper.js"></script>
+<script src="../js/notification-center.js"></script>
+<script>
+(function () {
+    'use strict';
+
+    var esc = NC.esc;
+    var today = NC.day(0);
+    var SLOTS = [['Sarapan', '06.00 - 08.00'], ['Makan siang', '11.00 - 13.00'], ['Makan malam', '17.00 - 19.00'], ['Snack', '09.00 dan 15.00']];
+
+    /* ---------- Penyimpanan ---------- */
+
+    var pasienStore = NC.store('pasien');
+
+    var pantStore = NC.store('pantangan');
+
+    var rekomStore = NC.store('rekomendasi');
+
+    // Menu Paket: diambil dari endpoint logistik, hanya baca dari sini.
+    var menuPaketRows = [];   // [{id, nama, totalKalori, resepList}]
+    var menuPaketOptions = []; // ['Nama Menu', ...]
+    var menuPaketKaloriMap = {}; // {'Nama Menu': 1800}
+    var menuPaketDietMap = {}; // {'Nama Menu': 'Diet Normal'}
+    var menuPaketTeksturMap = {}; // {'Nama Menu': 'Biasa'}
+    var resepMenuRows = [];
+
+    function refreshRecipeCache() {
+        if (!window.NutriCareAPI) return Promise.resolve();
+        return Promise.all([
+            window.NutriCareAPI.get('/logistik/menu', { showLoading: false }).then(function (rows) {
+                menuPaketRows = Array.isArray(rows) ? rows : [];
+                menuPaketOptions = [];
+                menuPaketKaloriMap = {};
+                menuPaketDietMap = {};
+                menuPaketTeksturMap = {};
+                menuPaketRows.forEach(function (m) {
+                    menuPaketOptions.push(m.nama);
+                    menuPaketKaloriMap[m.nama] = Number(m.totalKalori) || 0;
+                    menuPaketDietMap[m.nama] = m.diet || 'Diet Normal';
+                    menuPaketTeksturMap[m.nama] = m.tekstur || 'Biasa';
+                });
+            }).catch(function () {}),
+            window.NutriCareAPI.get('/logistik/resep', { showLoading: false }).then(function (rows) {
+                resepMenuRows = Array.isArray(rows) ? rows : [];
+            }).catch(function () {})
+        ]);
+    }
+
+    var menuPaketReady = refreshRecipeCache();
+    window.addEventListener('nutricare:refresh', refreshRecipeCache);
+
+    function recipeComposition(menu) {
+        if (!menu) return '-';
+        var direct = resepMenuRows.filter(function (row) { return (row.menu || '').toLowerCase() === String(menu).toLowerCase(); });
+        if (direct.length) {
+            return direct.map(function (row) {
+                return row.bahan + ' ' + row.jumlahPerPorsi + ' ' + row.satuan;
+            }).join(', ');
+        }
+        var paket = menuPaketRows.find(function (m) { return (m.nama || '').toLowerCase() === String(menu).toLowerCase(); });
+        if (paket && Array.isArray(paket.resepList) && paket.resepList.length) {
+            var items = [];
+            paket.resepList.forEach(function (r) {
+                var resepNama = r.resep || r;
+                var bahanRows = resepMenuRows.filter(function (row) { return (row.menu || '').toLowerCase() === String(resepNama).toLowerCase(); });
+                if (bahanRows.length) {
+                    bahanRows.forEach(function (b) {
+                        items.push(b.bahan + ' ' + b.jumlahPerPorsi + ' ' + b.satuan);
+                    });
+                } else if (resepNama) {
+                    items.push(resepNama);
+                }
+            });
+            if (items.length) return items.join(', ');
+        }
+        return '-';
+    }
+
+    var jadwalStore = NC.store('jadwal');
+
+    var perawatStore = NC.store('perawat');
+
+    /* ---------- Helper ---------- */
+
+    function patients() {
+        return pasienStore.all().map(function (p) { return p.nama; });
+    }
+
+    function find(nama) {
+        return pasienStore.all().filter(function (p) { return p.nama === nama; })[0];
+    }
+
+    function room(nama) {
+        var p = find(nama);
+        return p ? p.ruangan : '-';
+    }
+
+    function allergens(nama) {
+        var out = [];
+        pantStore.all().filter(function (r) { return r.pasien === nama; }).forEach(function (r) {
+            String(r.alergi || '').split(',').forEach(function (a) {
+                a = a.trim();
+                if (a && a !== '-') out.push(a);
+            });
+        });
+        return out;
+    }
+
+    function hasAllergy(p) {
+        return allergens(p.nama).length > 0;
+    }
+
+    /* ---------- Tabel gabungan pasien + pantangan (hanya baca) ---------- */
+
+    function mergedPatients() {
+        var pantRows = pantStore.all();
+        var usedIds = [];
+
+        var rows = pasienStore.all().map(function (p) {
+            var related = pantRows.filter(function (r) { return r.pasien === p.nama; });
+            var alergi = [];
+            var pantangan = [];
+            var catatan = [];
+
+            related.forEach(function (r) {
+                usedIds.push(r.id);
+                String(r.alergi || '').split(',').forEach(function (a) {
+                    a = a.trim();
+                    if (a && a !== '-' && alergi.indexOf(a) === -1) alergi.push(a);
+                });
+                if (r.pantangan && r.pantangan !== '-') pantangan.push(r.pantangan);
+                if (r.catatan) catatan.push(r.catatan);
+            });
+
+            return {
+                id: p.id,
+                nama: p.nama,
+                rm: p.rm,
+                ruangan: p.ruangan,
+                diagnosis: p.diagnosis,
+                usia: p.usia,
+                bb: p.bb,
+                tb: p.tb,
+                kalori: p.kalori,
+                tekstur: p.tekstur,
+                status: p.status,
+                alergi: alergi.join(', ') || '-',
+                pantangan: pantangan.join('; ') || '-',
+                catatan: catatan.join('; ') || '-',
+                punyaCatatan: related.length > 0
+            };
+        });
+
+        /* Pantangan yang pasiennya belum ada di daftar pasien tetap ditampilkan */
+        pantRows.filter(function (r) { return usedIds.indexOf(r.id) === -1; }).forEach(function (r) {
+            rows.push({
+                id: r.id,
+                nama: r.pasien,
+                rm: '-',
+                ruangan: '-',
+                diagnosis: '-',
+                usia: '-',
+                bb: null,
+                tb: null,
+                kalori: null,
+                tekstur: '-',
+                status: '-',
+                alergi: (r.alergi && r.alergi !== '-') ? r.alergi : '-',
+                pantangan: r.pantangan || '-',
+                catatan: r.catatan || '-',
+                punyaCatatan: true
+            });
+        });
+
+        return rows;
+    }
+
+    var pasienGabungan = { all: mergedPatients };
+
+    NC.crud({
+        mount: '#crud-pasien',
+        store: pasienGabungan,
+        readOnly: true,
+        noun: 'pasien',
+        layout: 'cards',
+        searchPlaceholder: 'Cari nama, rekam medis, ruangan, alergi, atau pantangan',
+        search: ['nama', 'rm', 'ruangan', 'diagnosis', 'alergi', 'pantangan', 'catatan'],
+        filter: { label: 'Status', options: ['Aktif', 'Evaluasi', 'Pulang'], key: 'status' },
+        sort: function (a, b) { return String(a.nama).localeCompare(String(b.nama)); },
+        label: function (r) { return r.nama; },
+        empty: { title: 'Belum ada data pasien', hint: 'Data pasien dan pantangan diisi oleh admin, lalu tampil di sini untuk dilihat.' },
+        card: function (r) {
+            var alergi = String(r.alergi || '').trim();
+            var pantangan = String(r.pantangan || '').trim();
+            var alergiKosong = !alergi || alergi === '-' || /^tidak ada$/i.test(alergi);
+            var pantanganKosong = !pantangan || pantangan === '-' || /^tidak ada$/i.test(pantangan);
+            var bmi = (r.bb && r.tb) ? (r.bb / Math.pow(r.tb / 100, 2)).toFixed(1) : '-';
+            var status = r.status && r.status !== '-' ? NC.badge(r.status) : '';
+            var facts = [
+                r.bb ? 'BB ' + r.bb + ' kg' : '',
+                r.tb ? 'TB ' + r.tb + ' cm' : '',
+                bmi !== '-' ? 'IMT ' + bmi : '',
+                r.kalori ? r.kalori + ' kkal' : '',
+                r.tekstur && r.tekstur !== '-' ? r.tekstur : ''
+            ].filter(Boolean);
+            return '<header class="pt-card-head"><div><strong>' + esc(r.nama) + '</strong><small>' +
+                esc(r.rm) + (r.ruangan && r.ruangan !== '-' ? ' \u00b7 ' + esc(r.ruangan) : '') + '</small></div>' + status + '</header>' +
+                '<p class="pt-card-diag">' + esc(r.diagnosis && r.diagnosis !== '-' ? r.diagnosis : 'Diagnosis belum diisi') + '</p>' +
+                '<div class="restriction-tags">' +
+                '<span class="restriction-tag' + (alergiKosong ? ' is-empty' : ' is-danger') + '"><small>Alergi</small><b>' +
+                esc(alergiKosong ? 'Tidak ada' : alergi) + '</b></span>' +
+                '<span class="restriction-tag' + (pantanganKosong ? ' is-empty' : ' is-warn') + '"><small>Pantangan</small><b>' +
+                esc(pantanganKosong ? 'Tidak ada' : pantangan) + '</b></span>' +
+                '</div>' +
+                (facts.length ? '<p class="pt-card-facts">' + facts.map(function (f) { return '<span>' + esc(f) + '</span>'; }).join('') + '</p>' : '');
+        },
+        columns: [
+            { label: 'Pasien', render: function (r) { return '<strong>' + esc(r.nama) + '</strong><small>' + esc(r.rm) + '</small>'; } },
+            { label: 'Ruangan', render: function (r) { return esc(r.ruangan); } },
+            { label: 'Diagnosis', render: function (r) { return esc(r.diagnosis); } },
+            { label: 'Alergi', render: function (r) { return r.alergi && r.alergi !== '-' ? '<span class="badge danger">' + esc(r.alergi) + '</span>' : '<span class="cell-empty">Tidak ada</span>'; } },
+            { label: 'Pantangan', render: function (r) { return r.pantangan && r.pantangan !== '-' ? esc(r.pantangan) : '<span class="cell-empty">Tidak ada</span>'; } },
+            { label: 'Status', render: function (r) { return r.status && r.status !== '-' ? NC.badge(r.status) : '-'; } }
+        ],
+        actions: [
+            { label: 'Rekomendasikan menu', show: function (r) { return !!find(r.nama); }, run: function (r) {
+                window.location.hash = '#rekomendasi';
+                menuPaketReady.then(function () {
+                    rekom.open(null, {
+                        pasien: r.nama,
+                        tekstur: r.tekstur && r.tekstur !== '-' ? r.tekstur : '',
+                        kalori: r.kalori || ''
+                    });
+                });
+            } },
+            { label: 'Detail', run: function (r) {
+                var bmi = (r.bb && r.tb) ? (r.bb / Math.pow(r.tb / 100, 2)).toFixed(1) : '-';
+                NC.detail(r.nama, [
+                    ['Nomor rekam medis', r.rm],
+                    ['Ruangan', r.ruangan],
+                    ['Diagnosis', r.diagnosis],
+                    ['Usia', r.usia === '-' ? '-' : r.usia + ' tahun'],
+                    ['Berat badan', r.bb ? r.bb + ' kg' : '-'],
+                    ['Tinggi badan', r.tb ? r.tb + ' cm' : '-'],
+                    ['Indeks massa tubuh', bmi],
+                    ['Kebutuhan kalori', r.kalori ? r.kalori + '\u00a0kkal' : '-'],
+                    ['Tekstur makanan', r.tekstur],
+                    ['Status', r.status],
+                    ['Alergi', r.alergi && r.alergi !== '-' ? r.alergi : 'Tidak ada alergi tercatat'],
+                    ['Pantangan', r.pantangan && r.pantangan !== '-' ? r.pantangan : 'Tidak ada pantangan makanan'],
+                    ['Catatan', r.catatan && r.catatan !== '-' ? r.catatan : 'Tidak ada catatan tambahan']
+                ], 'Data hanya dapat dilihat. Hubungi admin untuk mengubah data pasien, pantangan, atau alergi.');
+            } }
+        ]
+    });
+
+    /* ---------- CRUD: rekomendasi ---------- */
+
+    function bindMenuPaketAutoFill(form) {
+        var menuSel = form.elements['menu'];
+        var kaloriInput = form.elements['kalori'];
+        var dietInput = form.elements['diet'];
+        var teksturInput = form.elements['tekstur'];
+        if (!menuSel || !kaloriInput || !dietInput || !teksturInput) return;
+        kaloriInput.readOnly = true;
+        dietInput.readOnly = true;
+        teksturInput.readOnly = true;
+        function syncMenuAttributes() {
+            var menu = menuSel.value;
+            var calories = menuPaketKaloriMap[menu];
+            kaloriInput.value = calories === undefined ? '' : String(calories);
+            dietInput.value = menuPaketDietMap[menu] || '';
+            teksturInput.value = menuPaketTeksturMap[menu] || '';
+        }
+        menuSel.addEventListener('change', syncMenuAttributes);
+        // Tunggu daftar menu terisi; sinkronkan juga bila cache sedang diperbarui.
+        menuPaketReady.then(syncMenuAttributes);
+        window.addEventListener('nutricare:refresh', function () {
+            menuPaketReady = refreshRecipeCache();
+            menuPaketReady.then(syncMenuAttributes);
+        });
+    }
+
+    var rekomFields = [
+        { key: 'tanggal', label: 'Tanggal', type: 'date', required: true, default: function () { return today; } },
+        { key: 'pasien', label: 'Nama pasien', type: 'select', required: true, options: patients },
+        { key: 'waktu', label: 'Waktu makan', type: 'select', required: true, options: ['Sarapan', 'Makan siang', 'Makan malam', 'Snack'] },
+        { key: 'tekstur', label: 'Tekstur', type: 'text', required: true, readOnly: true, placeholder: 'Otomatis dari menu paket' },
+        { key: 'menu', label: 'Menu paket', type: 'select', required: true,
+          options: function () { return menuPaketOptions.length ? menuPaketOptions : ['(Belum ada menu paket - buat di halaman Logistik)']; }
+        },
+        { key: 'kalori', label: 'Total kalori (kkal)', type: 'number', min: 0, max: 9999, required: true, readOnly: true, placeholder: 'Otomatis dari menu paket' },
+        { key: 'diet', label: 'Diet', type: 'text', required: true, readOnly: true, placeholder: 'Otomatis dari menu paket' },
+        { key: 'catatan', label: 'Catatan untuk dapur', type: 'textarea', full: true }
+    ];
+
+    var rekomCols = [
+        { label: 'Menu', render: function (r) { return '<strong>' + esc(r.menu) + '</strong><small>' + esc(NC.fmtDate(r.tanggal) + ' · ' + r.pasien) + '</small>'; } },
+        { label: 'Waktu', render: function (r) { return esc(r.waktu); } },
+        { label: 'Kalori', render: function (r) { return esc(r.kalori + '\u00a0kkal'); } },
+        { label: 'Diet', render: function (r) { return esc(r.diet); } },
+        { label: 'Status', render: function (r) { return NC.badge(r.status); } }
+    ];
+
+    var rekom = NC.crud({
+        mount: '#crud-rekom',
+        store: rekomStore,
+        noun: 'rekomendasi',
+        addLabel: 'Buat rekomendasi',
+        searchPlaceholder: 'Cari menu atau pasien',
+        search: ['menu', 'pasien', 'komposisi'],
+        formReady: function (form) { bindMenuPaketAutoFill(form); },
+        filter: { label: 'Status', options: ['Draf', 'Dikirim', 'Evaluasi'], key: 'status' },
+        dateFilter: { key: 'tanggal', label: 'Cari tanggal' },
+        hidePast: true,
+        sort: function (a, b) { return b.tanggal.localeCompare(a.tanggal); },
+        label: function (r) { return 'Rekomendasi ' + r.menu; },
+        empty: { title: 'Belum ada rekomendasi aktif', hint: 'Pilih tanggal tertentu untuk melihat rekomendasi yang sudah lewat.' },
+        columns: rekomCols,
+        actions: [
+            { label: 'Kirim ke dapur', show: function (r) { return r.status !== 'Dikirim'; }, run: function (r) {
+                rekomStore.update(r.id, { status: 'Dikirim' });
+                NC.toast('Rekomendasi dikirim');
+            } }
+        ],
+        fields: rekomFields,
+        beforeSave: function (values, old) {
+            values.komposisi = recipeComposition(values.menu);
+            values.status = old ? old.status : 'Dikirim';
+            return values;
+        },
+        validate: function (v) {
+            if (menuPaketOptions.length && !menuPaketOptions.some(function (m) { return m === v.menu; })) {
+                return 'Pilih menu dari daftar menu paket yang tersedia.';
+            }
+            var text = (v.menu + ' ' + v.komposisi).toLowerCase();
+            var hit = allergens(v.pasien).filter(function (a) { return text.indexOf(a.toLowerCase()) > -1; })[0];
+            if (hit) return 'Komposisi mengandung ' + hit.toLowerCase() + ', alergi yang tercatat untuk ' + v.pasien + '.';
+            var out = NC.bahan.all().filter(function (b) {
+                return NC.bahanStatus(b) === 'Habis' && text.indexOf(b.nama.toLowerCase()) > -1;
+            })[0];
+            return out ? 'Stok ' + out.nama.toLowerCase() + ' sedang habis. Pilih bahan pengganti.' : null;
+        }
+    });
+
+    /* ---------- CRUD: jadwal ---------- */
+
+    NC.crud({
+        mount: '#crud-jadwal',
+        store: jadwalStore,
+        noun: 'jadwal makan',
+        addLabel: 'Tambah jadwal',
+        searchPlaceholder: 'Cari pasien atau menu',
+        search: ['pasien', 'menu'],
+        formReady: function (form) { bindMenuPaketAutoFill(form); },
+        filter: { label: 'Waktu', options: ['Sarapan', 'Makan siang', 'Makan malam', 'Snack'], key: 'waktu' },
+        sort: function (a, b) { return a.jam.localeCompare(b.jam); },
+        label: function (r) { return 'Jadwal ' + r.pasien + ' (' + r.waktu.toLowerCase() + ')'; },
+        empty: { title: 'Belum ada jadwal', hint: 'Tambahkan jadwal agar dapur tahu kapan menu didistribusikan.' },
+        columns: [
+            { label: 'Pasien', render: function (r) { return '<strong>' + esc(r.pasien) + '</strong><small>' + esc(room(r.pasien)) + '</small>'; } },
+            { label: 'Waktu makan', render: function (r) { return esc(r.waktu); } },
+            { label: 'Menu paket', render: function (r) { return esc(r.menu); } },
+            { label: 'Kalori', render: function (r) { return r.kalori ? esc(r.kalori) + '\u00a0kkal' : '<span class="cell-empty">-</span>'; } },
+            { label: 'Jam', render: function (r) { return esc(r.jam.replace(':', '.')); } },
+            { label: 'Status', render: function (r) { return NC.badge(r.status); } }
+        ],
+        actions: [
+            { label: 'Tandai terkirim', show: function (r) { return r.status !== 'Terkirim'; }, run: function (r) {
+                jadwalStore.update(r.id, { status: 'Terkirim' });
+                NC.toast('Jadwal terkirim');
+            } }
+        ],
+        fields: [
+            { key: 'pasien', label: 'Nama pasien', type: 'select', required: true, options: patients },
+            { key: 'waktu', label: 'Waktu makan', type: 'select', required: true, options: ['Sarapan', 'Makan siang', 'Makan malam', 'Snack'] },
+            { key: 'menu', label: 'Menu paket', type: 'select', required: true,
+              options: function () { return menuPaketOptions.length ? menuPaketOptions : ['(Belum ada menu paket - buat di halaman Logistik)']; }
+            },
+            { key: 'kalori', label: 'Total kalori (kkal)', type: 'number', min: 0, required: true, placeholder: 'Otomatis dari menu paket' },
+            { key: 'jam', label: 'Jam distribusi', type: 'time', required: true, default: '06:00' },
+            { key: 'status', label: 'Status', type: 'select', required: true, options: ['Terjadwal', 'Menunggu', 'Terkirim'], default: 'Terjadwal' }
+        ],
+        validate: function (v, old) {
+            var dup = jadwalStore.all().some(function (r) { return r.pasien === v.pasien && r.waktu === v.waktu && (!old || r.id !== old.id); });
+            return dup ? v.pasien + ' sudah punya jadwal ' + v.waktu.toLowerCase() + '. Ubah jadwal yang ada.' : null;
+        }
+    });
+
+    /* ---------- Tabel baca: perawat, bahan, riwayat ---------- */
+
+    NC.crud({
+        mount: '#crud-perawat',
+        store: perawatStore,
+        noun: 'informasi perawat',
+        addLabel: 'Tambah informasi',
+        searchPlaceholder: 'Cari pasien atau kondisi',
+        search: ['pasien', 'info'],
+        filter: { label: 'Status', options: ['Baru', 'Evaluasi', 'Ditinjau'], key: 'status' },
+        sort: function (a, b) { return b.waktu.localeCompare(a.waktu); },
+        empty: { title: 'Belum ada informasi', hint: 'Laporan dari perawat akan tampil di sini.' },
+        columns: [
+            { label: 'Pasien', render: function (r) { return '<strong>' + esc(r.pasien) + '</strong><small>' + esc(room(r.pasien)) + '</small>'; } },
+            { label: 'Kondisi', render: function (r) { return esc(r.info); } },
+            { label: 'Tanggal', render: function (r) { return esc(r.tanggal ? NC.fmtDate(r.tanggal) : '-'); } },
+            { label: 'Waktu', render: function (r) { return esc(r.waktu.replace(':', '.')); } },
+            { label: 'Status', render: function (r) { return NC.badge(r.status); } }
+        ],
+        fields: [
+            { key: 'pasien', label: 'Nama pasien', type: 'select', required: true, options: patients },
+            { key: 'info', label: 'Informasi kondisi', type: 'textarea', required: true, full: true },
+            { key: 'tanggal', label: 'Tanggal laporan', type: 'date', required: true, default: function () { return today; } },
+            { key: 'waktu', label: 'Waktu laporan', type: 'time', required: true },
+            { key: 'status', label: 'Status', type: 'select', required: true, options: ['Baru', 'Evaluasi', 'Ditinjau'], default: 'Baru' }
+        ],
+        actions: [
+            { label: 'Tandai ditinjau', show: function (r) { return r.status !== 'Ditinjau'; }, run: function (r) {
+                perawatStore.update(r.id, { status: 'Ditinjau' });
+                NC.toast('Ditandai ditinjau');
+            } }
+        ]
+    });
+
+    NC.crud({
+        mount: '#crud-bahan',
+        store: NC.bahan,
+        readOnly: true,
+        noun: 'bahan',
+        addLabel: 'Tambah bahan',
+        searchPlaceholder: 'Cari nama atau kategori bahan',
+        search: ['nama', 'kategori'],
+        filter: { label: 'Status', options: ['Aman', 'Periksa', 'Menipis', 'Habis', 'Kedaluwarsa'], value: function (r) { return NC.bahanStatus(r); } },
+        sort: function (a, b) { return a.nama.localeCompare(b.nama); },
+        columns: [
+            { label: 'Nama bahan', render: function (r) { return '<strong>' + esc(r.nama) + '</strong>'; } },
+            { label: 'Kategori', render: function (r) { return esc(r.kategori); } },
+            { label: 'Stok', render: function (r) { return esc(r.stok + ' ' + r.satuan); } },
+            { label: 'Kedaluwarsa', render: function (r) { return esc(NC.fmtDate(r.kedaluwarsa)); } },
+            { label: 'Status', render: function (r) { return NC.badge(NC.bahanStatus(r)); } }
+        ],
+        fields: [
+            { key: 'nama', label: 'Nama bahan', required: true },
+            { key: 'kategori', label: 'Kategori', type: 'select', required: true, options: ['Karbohidrat', 'Protein', 'Sayuran', 'Buah', 'Bumbu', 'Lainnya'] },
+            { key: 'stok', label: 'Jumlah stok', type: 'number', min: 0, required: true },
+            { key: 'satuan', label: 'Satuan', type: 'select', required: true, options: ['kg', 'gram', 'liter', 'ml', 'butir', 'ikat'] },
+            { key: 'minimum', label: 'Batas minimum', type: 'number', min: 0, required: true },
+            { key: 'kedaluwarsa', label: 'Tanggal kedaluwarsa', type: 'date', required: true }
+        ]
+    });
+
+    NC.crud({
+        mount: '#crud-riwayat',
+        store: rekomStore,
+        noun: 'riwayat rekomendasi',
+        addLabel: 'Tambah riwayat',
+        searchPlaceholder: 'Cari menu atau pasien',
+        search: ['menu', 'pasien'],
+        filter: { label: 'Status', options: ['Draf', 'Dikirim', 'Evaluasi'], key: 'status' },
+        sort: function (a, b) { return b.tanggal.localeCompare(a.tanggal); },
+        empty: { title: 'Belum ada riwayat', hint: 'Rekomendasi yang dibuat akan tercatat di sini.' },
+        columns: rekomCols,
+        fields: rekomFields,
+        beforeSave: function (values, old) {
+            values.komposisi = recipeComposition(values.menu);
+            values.status = old ? old.status : 'Dikirim';
+            return values;
+        },
+        validate: function (v) {
+            if (menuPaketOptions.length && !menuPaketOptions.some(function (m) { return m === v.menu; })) {
+                return 'Pilih menu dari daftar menu paket yang tersedia.';
+            }
+            var text = (v.menu + ' ' + v.komposisi).toLowerCase();
+            var hit = allergens(v.pasien).filter(function (a) { return text.indexOf(a.toLowerCase()) > -1; })[0];
+            if (hit) return 'Komposisi mengandung ' + hit.toLowerCase() + ', alergi yang tercatat untuk ' + v.pasien + '.';
+            var out = NC.bahan.all().filter(function (b) {
+                return NC.bahanStatus(b) === 'Habis' && text.indexOf(b.nama.toLowerCase()) > -1;
+            })[0];
+            return out ? 'Stok ' + out.nama.toLowerCase() + ' sedang habis. Pilih bahan pengganti.' : null;
+        }
+    });
+
+    /* ---------- Tampilan turunan ---------- */
+
+    function render() {
+        var pasien = pasienStore.all();
+        var rek = rekomStore.all();
+        var jad = jadwalStore.all();
+        var bahan = NC.bahan.all();
+        var evalCount = pasien.filter(function (p) { return p.status === 'Evaluasi'; }).length;
+        var withAllergy = pasien.filter(hasAllergy).length;
+
+        /* dashboard */
+        NC.set('d-pasien', pasien.length);
+        NC.set('d-rekom', rek.length);
+        NC.set('d-alergi', withAllergy);
+        NC.set('d-evaluasi', evalCount);
+
+        var hariIni = new Intl.DateTimeFormat('id-ID', { dateStyle: 'full' }).format(new Date());
+        document.getElementById('g-summary').textContent = hariIni + '. ' + pasien.length + ' pasien, ' +
+            rek.length + ' rekomendasi menu, ' + jad.length + ' jadwal makan tercatat.';
+
+        document.getElementById('d-tabel').innerHTML = pasien.length
+            ? '<table><thead><tr><th>Pasien</th><th>Ruangan</th><th>Diagnosis</th><th>Kalori</th><th>Status</th></tr></thead><tbody>' +
+              pasien.slice(-5).reverse().map(function (p) {
+                  return '<tr><td><strong>' + esc(p.nama) + '</strong></td><td>' + esc(p.ruangan) + '</td><td>' + esc(p.diagnosis) +
+                      '</td><td>' + esc(p.kalori + '\u00a0kkal') + '</td><td>' + NC.badge(p.status) + '</td></tr>';
+              }).join('') + '</tbody></table>'
+            : '<div class="empty"><strong>Belum ada pasien</strong><p>Data pasien diisi oleh admin dan tampil di halaman data pasien.</p></div>';
+
+        var notes = [];
+        pasien.filter(function (p) { return p.status === 'Evaluasi'; }).forEach(function (p) {
+            notes.push({ tone: 'warning', label: 'Evaluasi', title: p.nama, note: 'Perlu evaluasi menu bersama tim medis.' });
+        });
+        pasien.filter(hasAllergy).forEach(function (p) {
+            notes.push({ tone: 'critical', label: 'Alergi', title: p.nama, note: 'Alergi: ' + allergens(p.nama).join(', ') + '.' });
+        });
+        var short = bahan.filter(function (b) { return ['Menipis', 'Habis', 'Kedaluwarsa'].indexOf(NC.bahanStatus(b)) > -1; });
+        if (short.length) {
+            notes.push({ tone: '', label: 'Info', title: 'Informasi logistik', note: short.length + ' bahan perlu diisi ulang. Cek stok sebelum menentukan menu.' });
+        }
+        var sub = document.getElementById('d-perhatian-sub');
+        if (sub) {
+            sub.textContent = notes.length
+                ? notes.length + ' catatan perlu perhatian, dihitung dari status pasien dan stok.'
+                : 'Tidak ada catatan hari ini.';
+        }
+        var bobot = { critical: 0, warning: 1, '': 2 };
+        notes.sort(function (a, b) { return bobot[a.tone] - bobot[b.tone]; });
+        document.getElementById('d-perhatian').innerHTML = notes.length
+            ? '<ul class="queue">' + notes.slice(0, 6).map(function (n) {
+                var rasa = n.tone === 'critical' ? 'danger' : (n.tone === 'warning' ? 'warning' : 'neutral');
+                return '<li class="queue-row"' + (n.tone ? ' data-tone="' + n.tone + '"' : '') + '>' +
+                    '<div class="queue-body"><div class="queue-title">' + esc(n.title) + '</div>' +
+                    '<div class="queue-note">' + esc(n.note) + '</div></div>' +
+                    '<div class="queue-meta"><span class="badge ' + rasa + '">' + esc(n.label) + '</span></div></li>';
+            }).join('') + '</ul>'
+            : '<div class="empty"><strong>Tidak ada catatan</strong><p>Semua pasien sudah ditinjau dan stok bahan mencukupi.</p></div>';
+
+        document.getElementById('d-slots').innerHTML = SLOTS.map(function (s) {
+            var n = jad.filter(function (j) { return j.waktu === s[0]; }).length;
+            return '<div class="slot"><span>' + esc(s[0]) + '</span><strong>' + n + ' pasien</strong><span>' + esc(s[1]) + '</span></div>';
+        }).join('');
+
+        /* pantangan */
+        var pant = pantStore.all();
+        NC.set('n-alergi', withAllergy);
+        NC.set('n-pantang', new Set(pant.map(function (r) { return r.pasien; })).size);
+        NC.set('n-belum', pasien.filter(function (p) { return !pant.some(function (r) { return r.pasien === p.nama; }); }).length);
+
+        /* jadwal */
+        document.getElementById('j-ledger').innerHTML = SLOTS.map(function (s) {
+            return '<div class="ledger-cell"><div class="ledger-label">' + esc(s[0]) + '</div><div class="ledger-value">' +
+                jad.filter(function (j) { return j.waktu === s[0]; }).length + '</div><div class="ledger-note">' + esc(s[1]) + '</div></div>';
+        }).join('');
+
+        /* perawat */
+        var open = perawatStore.all().filter(function (r) { return r.status !== 'Ditinjau'; });
+        document.getElementById('pr-notes').innerHTML = open.map(function (r) {
+            return '<div class="notice ' + (r.status === 'Evaluasi' ? 'warn' : '') + '"><strong>' + esc(r.pasien) + ' · ' + esc(room(r.pasien)) + '</strong>' + esc(r.info) + '.</div>';
+        }).join('') || '<div class="empty"><strong>Semua sudah ditinjau</strong></div>';
+
+        /* bahan */
+        var st = function (n) { return bahan.filter(function (b) { return NC.bahanStatus(b) === n; }).length; };
+        NC.set('b-total', bahan.length);
+        NC.set('b-aman', st('Aman'));
+        NC.set('b-menipis', st('Menipis') + st('Periksa'));
+        NC.set('b-habis', st('Habis') + st('Kedaluwarsa'));
+
+        /* laporan */
+        NC.set('l-pasien', pasien.length);
+        NC.set('l-rekom', rek.length);
+        NC.set('l-diet', rek.filter(function (r) { return r.diet !== 'Diet Normal'; }).length);
+        NC.set('l-eval', evalCount);
+
+        var ranges = [['Di bawah 1500 kkal', 0, 1499], ['1500 sampai 1800 kkal', 1500, 1800], ['1801 sampai 2200 kkal', 1801, 2200], ['Di atas 2200 kkal', 2201, 99999]];
+        var total = pasien.length || 1;
+        document.getElementById('l-kalori').innerHTML = ranges.map(function (r) {
+            var n = pasien.filter(function (p) { return p.kalori >= r[1] && p.kalori <= r[2]; }).length;
+            return NC.meter(r[0], n + ' pasien · ' + Math.round(n / total * 100) + '%', n / total * 100);
+        }).join('');
+
+        var diets = ['Diet Normal', 'Diet Diabetes', 'Diet Rendah Garam', 'Diet Khusus'];
+        var counts = diets.map(function (d) { return rek.filter(function (r) { return r.diet === d; }).length; });
+        var peak = Math.max.apply(null, counts.concat([1]));
+        document.getElementById('l-diet-bars').innerHTML = diets.map(function (d, i) {
+            return '<div class="bar-col"><b>' + counts[i] + '</b><div class="bar" style="height:' + Math.round(counts[i] / peak * 82) +
+                '%"></div><span>' + esc(d.replace('Diet ', '')) + '</span></div>';
+        }).join('');
+    }
+
+    document.getElementById('ekspor-pasien').addEventListener('click', function () {
+        NC.csv('data-pasien.csv', ['Nama', 'No. RM', 'Ruangan', 'Diagnosis', 'Kalori', 'Tekstur', 'Status'],
+            pasienStore.all().map(function (p) { return [p.nama, p.rm, p.ruangan, p.diagnosis, p.kalori, p.tekstur, p.status]; }));
+        NC.toast('CSV diunduh');
+    });
+
+    NC.onRender(render);
+    render();
+
+    NC.settings('ahli-gizi', { nama: '', email: '', telepon: '' });
+    NC.today();
+    NC.router('Ahli Gizi');
+    
+    // Profile Dropdown Handler
+    (function() {
+        const profileTrigger = document.getElementById('profile-trigger');
+        const profileDropdown = document.getElementById('profile-dropdown');
+        const notificationBell = document.getElementById('notification-bell');
+        const notificationDropdown = document.getElementById('notification-dropdown');
+        const logoutBtn = document.getElementById('logout-btn');
+        
+        if (!profileTrigger || !profileDropdown) return;
+        
+        // Toggle profile dropdown
+        profileTrigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = profileTrigger.getAttribute('aria-expanded') === 'true';
+            
+            if (isOpen) {
+                closeProfileDropdown();
+            } else {
+                closeNotificationDropdown(); // Close notification first
+                openProfileDropdown();
+            }
+        });
+        
+        // Toggle notification dropdown (hook into existing handler)
+        if (notificationBell) {
+            notificationBell.addEventListener('click', () => {
+                // Close profile when opening notification
+                setTimeout(() => {
+                    if (notificationDropdown && notificationDropdown.classList.contains('show')) {
+                        closeProfileDropdown();
+                    }
+                }, 0);
+            });
+        }
+        
+        function openProfileDropdown() {
+            profileTrigger.setAttribute('aria-expanded', 'true');
+            profileDropdown.classList.add('show');
+        }
+        
+        function closeProfileDropdown() {
+            profileTrigger.setAttribute('aria-expanded', 'false');
+            profileDropdown.classList.remove('show');
+        }
+        
+        function closeNotificationDropdown() {
+            if (notificationDropdown) {
+                notificationDropdown.classList.remove('show');
+            }
+        }
+        
+        // Close on outside click
+        document.addEventListener('click', (e) => {
+            if (!profileTrigger.contains(e.target) && !profileDropdown.contains(e.target)) {
+                closeProfileDropdown();
+            }
+        });
+        
+        // Close on Esc key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeProfileDropdown();
+            }
+        });
+        
+        // Logout handler (reuse existing logout logic)
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => {
+                // Clear session storage and redirect to login
+                sessionStorage.clear();
+                window.location.href = '../index.html';
+            });
+        }
+    })();
+})();
+</script>
+<script src="../js/auto-refresh.js"></script>
+<script src="../js/hms-shell.js"></script>
+</body>
+</html>

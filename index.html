@@ -1,0 +1,128 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login NutriCare</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/loading.css">
+    <link rel="stylesheet" href="css/notifications.css">
+    <link rel="icon" href="/favicon.ico?v=1" type="image/x-icon">
+</head>
+<body class="login-page">
+
+    <main class="login-layout">
+
+        <section class="login-visual">
+            <header class="brand">
+                <img class="brand-icon brand-logo" src="assets/images/logo/legos-transparent.png" alt="Logo NutriCare">
+                <a href="index.html">Nutri<span>Care</span></a>
+            </header>
+
+            <div class="visual-content">
+                <div class="status-pill">
+                    <span></span>
+                    SISTEM MANAJEMEN GIZI PASIEN
+                </div>
+
+                <h1>
+                    Nutrisi Tepat,<br>
+                    <span>Perawatan Lebih Baik.</span>
+                </h1>
+
+                <p>
+                    Kelola kebutuhan gizi pasien, persediaan bahan,
+                    rekomendasi menu, dan distribusi makanan
+                    melalui satu sistem terintegrasi.
+                </p>
+
+                <div class="food-image">
+                    <img
+                        src="assets/images/makanan/nasi-ayam-sayur.png"
+                        alt="Menu makanan sehat pasien"
+                    >
+
+                    <img
+                        src="assets/images/daun-tomat/daun-tomat.png"
+                        alt=""
+                        class="leaf leaf-one"
+                    >
+
+                    <img
+                        src="assets/images/daun-tomat/daun-tomat.png"
+                        alt=""
+                        class="leaf leaf-two"
+                    >
+
+                    <div class="food-caption">
+                        <span class="caption-icon">✦</span>
+                        <div>
+                            <strong>Menu Gizi Seimbang</strong>
+                            <small>Mendukung kebutuhan pasien</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="visual-footer">
+                NutriCare <span>•</span> Pelayanan gizi terpadu
+            </footer>
+        </section>
+
+        <section class="login-panel">
+
+            <div class="login-heading">
+                <span class="eyebrow">SELAMAT DATANG</span>
+                <h2>Masuk ke akun Anda</h2>
+                <p>Role akses ditetapkan dari akun Anda.</p>
+            </div>
+
+            <form id="login-form" action="/api/auth/login" method="post">
+
+                <label for="username">Username atau email</label>
+                <input
+                    type="text"
+                    id="username"
+                    name="username"
+                    placeholder="Masukkan username atau email"
+                    autocomplete="username"
+                    required
+                >
+
+                <label for="password">Kata sandi</label>
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Masukkan kata sandi"
+                    autocomplete="current-password"
+                    required
+                >
+
+                <div class="form-options">
+                    <label class="remember">
+                        <input type="checkbox" name="remember">
+                        <span>Ingat saya</span>
+                    </label>
+                    <span class="secure-label">Akses internal</span>
+                </div>
+
+                <button type="submit" class="login-button">
+                    Masuk ke Dashboard <span>→</span>
+                </button>
+
+            </form>
+
+            <p class="login-note">
+                NutriCare © 2026 · Sistem Pengelolaan Gizi Pasien
+            </p>
+
+        </section>
+
+    </main>
+
+    <script src="js/ui-utils.js"></script>
+    <script src="js/login.js"></script>
+</body>
+</html>

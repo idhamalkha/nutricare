@@ -1,0 +1,490 @@
+/* ============================================
+   NOTIFICATIONS & ALERTS - Minimalist & Modern
+   ============================================ */
+
+/* Toast Container */
+.toast-container {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    pointer-events: none;
+}
+
+/* Toast Notification */
+.toast {
+    min-width: 320px;
+    max-width: 480px;
+    background: white;
+    border-radius: 12px;
+    padding: 16px 20px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    pointer-events: all;
+    transform: translateX(400px);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.toast.show {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+.toast.hide {
+    transform: translateX(400px);
+    opacity: 0;
+}
+
+/* Toast Icon */
+.toast-icon {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* Toast Content */
+.toast-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.toast-title {
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0 0 4px 0;
+    line-height: 1.4;
+}
+
+.toast-message {
+    font-size: 13px;
+    line-height: 1.5;
+    margin: 0;
+    color: #666;
+}
+
+/* Toast Close Button */
+.toast-close {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    border: none;
+    background: transparent;
+    color: #999;
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+    padding: 0;
+    transition: color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.toast-close:hover {
+    color: #333;
+}
+
+/* Toast Variants */
+.toast.success {
+    border-left: 4px solid #4caf50;
+}
+
+.toast.success .toast-icon {
+    background: #e8f5e9;
+    color: #4caf50;
+}
+
+.toast.success .toast-title {
+    color: #2e7d32;
+}
+
+.toast.error {
+    border-left: 4px solid #f44336;
+}
+
+.toast.error .toast-icon {
+    background: #ffebee;
+    color: #f44336;
+}
+
+.toast.error .toast-title {
+    color: #c62828;
+}
+
+.toast.warning {
+    border-left: 4px solid #ff9800;
+}
+
+.toast.warning .toast-icon {
+    background: #fff3e0;
+    color: #ff9800;
+}
+
+.toast.warning .toast-title {
+    color: #e65100;
+}
+
+.toast.info {
+    border-left: 4px solid #2196f3;
+}
+
+.toast.info .toast-icon {
+    background: #e3f2fd;
+    color: #2196f3;
+}
+
+.toast.info .toast-title {
+    color: #1565c0;
+}
+
+/* Progress Bar in Toast */
+.toast-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background: currentColor;
+    opacity: 0.3;
+    animation: toast-progress 5s linear;
+}
+
+@keyframes toast-progress {
+    from { width: 100%; }
+    to { width: 0%; }
+}
+
+/* Inline Alert - For Forms */
+.alert {
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.5;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 12px 0;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.alert-icon {
+    flex-shrink: 0;
+    font-size: 16px;
+}
+
+.alert-content {
+    flex: 1;
+}
+
+.alert.success {
+    background: #e8f5e9;
+    color: #2e7d32;
+    border: 1px solid #c8e6c9;
+}
+
+.alert.error {
+    background: #ffebee;
+    color: #c62828;
+    border: 1px solid #ffcdd2;
+}
+
+.alert.warning {
+    background: #fff3e0;
+    color: #e65100;
+    border: 1px solid #ffe0b2;
+}
+
+.alert.info {
+    background: #e3f2fd;
+    color: #1565c0;
+    border: 1px solid #bbdefb;
+}
+
+/* Field Error - For Form Inputs */
+.field-error {
+    font-size: 12px;
+    color: #f44336;
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    animation: shake 0.3s ease;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+}
+
+.field-error::before {
+    content: '⚠';
+    font-size: 14px;
+}
+
+/* Input Error State */
+input.error,
+select.error,
+textarea.error {
+    border-color: #f44336 !important;
+    background: #fff5f5;
+}
+
+input.error:focus,
+select.error:focus,
+textarea.error:focus {
+    box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.1);
+}
+
+/* Modal Alert */
+.modal-alert {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10001;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+
+.modal-alert.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.modal-alert-content {
+    background: white;
+    border-radius: 16px;
+    padding: 32px;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    transform: scale(0.9);
+    transition: transform 0.2s ease;
+}
+
+.modal-alert.active .modal-alert-content {
+    transform: scale(1);
+}
+
+.modal-alert-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+}
+
+.modal-alert.success .modal-alert-icon {
+    background: #e8f5e9;
+    color: #4caf50;
+}
+
+.modal-alert.error .modal-alert-icon {
+    background: #ffebee;
+    color: #f44336;
+}
+
+.modal-alert-title {
+    font-size: 20px;
+    font-weight: 600;
+    text-align: center;
+    margin: 0 0 12px 0;
+    color: #333;
+}
+
+.modal-alert-message {
+    font-size: 14px;
+    text-align: center;
+    color: #666;
+    line-height: 1.6;
+    margin: 0 0 24px 0;
+}
+
+.modal-alert-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.modal-alert-actions button {
+    padding: 10px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.modal-alert-actions .btn-primary {
+    background: #4caf50;
+    color: white;
+}
+
+.modal-alert-actions .btn-primary:hover {
+    background: #43a047;
+}
+
+.modal-alert-actions .btn-secondary {
+    background: #f5f5f5;
+    color: #666;
+}
+
+.modal-alert-actions .btn-secondary:hover {
+    background: #e0e0e0;
+}
+
+/* Toast visual system NutriCare: petro, status semantik, tema klinik. */
+body.clinic .toast-container {
+    top: 18px;
+    right: 18px;
+    left: auto;
+    width: min(360px, calc(100vw - 36px));
+    gap: 8px;
+    pointer-events: none;
+}
+
+body.clinic .toast {
+    position: relative;
+    inset: auto;
+    box-sizing: border-box;
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+    padding: 12px 14px;
+    color: var(--c-ink);
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-inline-start: 3px solid var(--c-brand);
+    border-radius: var(--c-r-md);
+    box-shadow: var(--c-shadow-menu);
+    gap: 10px;
+    transform: translateY(-6px);
+    transition: opacity 140ms ease, transform 140ms ease;
+    pointer-events: auto;
+}
+
+body.clinic .toast.show { transform: translateY(0); }
+body.clinic .toast.hide { transform: translateY(-4px); }
+body.clinic .toast.success { border-inline-start-color: var(--c-success-rail); }
+body.clinic .toast.error { border-inline-start-color: var(--c-critical-rail); }
+body.clinic .toast.warning { border-inline-start-color: var(--c-warning-rail); }
+body.clinic .toast.info { border-inline-start-color: var(--c-brand); }
+
+body.clinic .toast .toast-icon {
+    width: 20px;
+    height: 20px;
+    color: var(--c-brand);
+    background: var(--c-brand-tint);
+    font-size: 12px;
+}
+body.clinic .toast.success .toast-icon { color: var(--c-success); background: var(--c-success-tint); }
+body.clinic .toast.error .toast-icon { color: var(--c-critical); background: var(--c-critical-tint); }
+body.clinic .toast.warning .toast-icon { color: var(--c-warning); background: var(--c-warning-tint); }
+body.clinic .toast.info .toast-icon { color: var(--c-brand); background: var(--c-brand-tint); }
+body.clinic .toast .toast-title { margin-bottom: 2px; color: var(--c-ink); font-size: 13px; }
+body.clinic .toast .toast-message { color: var(--c-muted); font-size: 13px; overflow-wrap: anywhere; }
+body.clinic .toast .toast-close { width: 24px; height: 24px; color: var(--c-muted); }
+body.clinic .toast .toast-close:hover { color: var(--c-ink); }
+
+@media (max-width: 480px) {
+    body.clinic .toast-container {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        width: auto;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    body.clinic .toast { transition: none; transform: none; }
+    body.clinic .toast.hide { transform: none; }
+}
+
+/* Badge Notification */
+.badge-notification {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.badge-notification.success {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.badge-notification.error {
+    background: #ffebee;
+    color: #c62828;
+}
+
+.badge-notification.warning {
+    background: #fff3e0;
+    color: #e65100;
+}
+
+.badge-notification.info {
+    background: #e3f2fd;
+    color: #1565c0;
+}
+
+/* Mobile Responsive */
+@media (max-width: 480px) {
+    .toast-container {
+        top: 16px;
+        right: 16px;
+        left: 16px;
+    }
+
+    .toast {
+        min-width: 0;
+        max-width: none;
+        width: 100%;
+    }
+
+    .modal-alert-content {
+        padding: 24px;
+    }
+}

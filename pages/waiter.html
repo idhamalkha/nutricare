@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <script src="../js/auth-guard.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Waiter | NutriCare</title>
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/loading.css">
+    <link rel="stylesheet" href="../css/notifications.css">
+    <link rel="stylesheet" href="../css/notifications-center.css">
+<link rel="stylesheet" href="../css/profile-dropdown.css">
+<link rel="stylesheet" href="../css/role-pages.css">
+    <link rel="stylesheet" href="../css/hms-clinic.css">
+    <style>
+        .nc-confirm-dialog { width: min(440px, calc(100vw - 32px)); border: 1px solid var(--border, #e5e7eb); border-radius: 18px; padding: 0; color: var(--text, #172033); background: var(--panel, #fff); box-shadow: 0 24px 70px rgba(15,23,42,.24); }
+        .nc-confirm-dialog::backdrop { background: rgba(15,23,42,.48); backdrop-filter: blur(3px); }
+        .nc-confirm-card { padding: 28px; }
+        .nc-confirm-card .confirm-icon { display:grid; place-items:center; width:44px; height:44px; border-radius:14px; color:var(--green,#15803d); background:color-mix(in srgb,var(--green,#15803d) 12%,transparent); font-size:23px; font-weight:700; }
+        .nc-confirm-card h2 { margin:18px 0 8px; font-size:21px; }
+        .nc-confirm-card p { margin:0; color:var(--muted,#64748b); line-height:1.6; }
+        .nc-confirm-card .confirm-actions { display:flex; justify-content:flex-end; gap:10px; margin-top:26px; }
+        @media(max-width:480px) { .nc-confirm-card { padding:22px; } .nc-confirm-card .confirm-actions { flex-direction:column-reverse; } .nc-confirm-card .confirm-actions .btn { width:100%; } }
+    </style>
+    <link rel="icon" href="/favicon.ico?v=1" type="image/x-icon">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+</head>
+<body class="clinic">
+<div class="app">
+    <aside class="sidebar">
+        <a href="#dashboard" class="brand" aria-label="NutriCare Waiter">
+            <img class="brand-mark brand-logo" src="../assets/images/logo/legos-transparent.png" alt="">
+            <div><div class="brand-name">Nutri<span>Care</span></div><small>Patient Nutrition System</small></div>
+        </a>
+
+        <div class="sidebar-date today"></div>
+
+        <div class="nav-title">Menu waiter</div>
+        <nav class="nav" aria-label="Menu waiter">
+            <a href="#dashboard" class="nav-link"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg></span> Dashboard</a>
+            <a href="#distribusi" class="nav-link"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"></circle><circle cx="12" cy="12" r="4"></circle></svg></span> Distribusi siap antar</a>
+            <a href="#terkirim" class="nav-link"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M8.4 12.4l2.6 2.6 4.6-5.2"></path></svg></span> Sudah terkirim</a>
+            <a href="#laporan" class="nav-link"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" fill="none"><rect x="3" y="12" width="4" height="9" rx="1"></rect><rect x="10" y="7" width="4" height="14" rx="1"></rect><rect x="17" y="3" width="4" height="18" rx="1"></rect></svg></span> Laporan harian</a>
+        </nav>
+    </aside>
+
+    <main class="main">
+        <header class="topbar">
+            <div class="crumb">NutriCare / Waiter / <strong id="crumb-page">Dashboard</strong></div>
+            
+            <!-- Area kosong di tengah -->
+            
+            <!-- Notification Bell & Profile Dropdown (pojok kanan) -->
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <!-- Notification Bell -->
+                <div class="notification-center">
+                    <button id="notification-bell" class="notification-bell" aria-label="Notifikasi">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                        </svg>
+                        <span id="notification-badge" class="notification-badge" style="display: none;"></span>
+                    </button>
+                    <div id="notification-dropdown" class="notification-dropdown">
+                        <div class="notification-header">
+                            <h3>Notifikasi</h3>
+                            <span id="notification-count" class="notification-count" hidden></span>
+                            <div class="notification-actions">
+                                <button id="mark-all-read" class="notification-action-btn">Tandai sudah dibaca</button>
+                                <button id="clear-all-notifications" class="notification-action-btn">Hapus semua</button>
+                            </div>
+                        </div>
+                        <div id="notification-list" class="notification-list">
+                            <div class="notification-empty">
+                                <div class="notification-empty-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg></div>
+                                <div class="notification-empty-text">Tidak ada notifikasi</div>
+                            </div>
+                        </div>
+                        <p class="notification-hint">Klik notifikasi untuk melihat rinciannya.</p>
+                    </div>
+                </div>
+                
+                <!-- Profile Dropdown -->
+                <div style="position: relative;">
+                    <button id="profile-trigger" class="profile-trigger" aria-haspopup="menu" aria-expanded="false">
+                        <div class="avatar" data-role-avatar>W</div>
+                        <div class="profile-info">
+                            <div class="profile-name" data-user-name>waiter</div>
+                            <div class="profile-role">Pramusaji</div>
+                        </div>
+                        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </button>
+                    
+                    <div id="profile-dropdown" class="profile-dropdown" role="menu">
+                        <a href="profil.html" class="profile-dropdown-item" role="menuitem">
+                            <svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                            <span>Profil</span>
+                        </a>
+                        <a href="pengaturan.html?role=waiter" class="profile-dropdown-item" role="menuitem">
+                            <svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <path d="M12 1v6m0 6v6m-5-13.66L9.5 8.5m8.66 3.5l-3.16 3.16m3.16 3.16L14.5 15.5M5.34 5.34L8.5 8.5M1 12h6m6 0h6"></path>
+                            </svg>
+                            <span>Pengaturan</span>
+                        </a>
+                        <div class="profile-dropdown-divider"></div>
+                        <button id="logout-btn" class="profile-dropdown-item danger" role="menuitem">
+                            <svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                <polyline points="16 17 21 12 16 7"></polyline>
+                                <line x1="21" y1="12" x2="9" y2="12"></line>
+                            </svg>
+                            <span>Keluar</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <section class="page" id="dashboard" data-title="Dashboard">
+            <div class="page-head">
+                <div>
+                    <h1>Dashboard</h1>
+                    <p id="w-summary">Ringkasan distribusi hari ini.</p>
+                </div>
+                <a href="#distribusi" class="btn">Buka distribusi</a>
+            </div>
+
+            <p class="clinic-section-label">Ringkasan hari ini</p>
+            <div class="clinic-metrics" data-cols="3">
+                <div class="clinic-metric"><div class="clinic-metric-label">Siap diantar</div><div class="clinic-metric-value" id="w-total">0</div><div class="clinic-metric-note">Antrean dari dapur</div></div>
+                <div class="clinic-metric"><div class="clinic-metric-label">Sudah terkirim</div><div class="clinic-metric-value" id="w-terkirim">0</div><div class="clinic-metric-note">Dikonfirmasi sampai ke pasien</div></div>
+                <div class="clinic-metric"><div class="clinic-metric-label">Total jadwal</div><div class="clinic-metric-value" id="w-jadwal">0</div><div class="clinic-metric-note">Siap antar dan terkirim</div></div>
+            </div>
+
+            <div class="grid-wide">
+                <section class="panel">
+                    <div class="panel-head"><div><h2>Distribusi berikutnya</h2><p>Jadwal yang belum berstatus terkirim.</p></div><a href="#distribusi" class="text-link">Kelola semua</a></div>
+                    <div id="w-ringkas"></div>
+                </section>
+                <section class="panel">
+                    <div class="panel-head"><div><h2>Catatan distribusi</h2><p>Pastikan makanan sesuai identitas pasien.</p></div></div>
+                    <div class="notice"><strong>Periksa sebelum mengantar</strong>Pastikan nama pasien, ruangan, waktu makan, dan menu sesuai dengan jadwal.</div>
+                    <div class="notice warn"><strong>Perhatikan diet khusus</strong>Hubungi ahli gizi bila menu tidak sesuai atau ada informasi pantangan yang belum jelas.</div>
+                </section>
+            </div>
+
+        </section>
+
+        <section class="page" id="distribusi" data-title="Distribusi makanan">
+            <div class="page-head"><div><h1>Distribusi makanan</h1><p>Kelola jadwal distribusi dan perbarui status saat makanan telah dikirim ke pasien.</p></div></div>
+            <section class="panel">
+                <div class="panel-head"><div><h2>Daftar distribusi</h2><p>Jadwal tersinkron dengan halaman ahli gizi dan perawat.</p></div></div>
+                <div id="crud-distribusi"></div>
+            </section>
+        </section>
+
+        <section class="page" id="terkirim" data-title="Sudah terkirim">
+            <div class="page-head"><div><h1>Sudah terkirim</h1><p>Riwayat makanan yang telah dikonfirmasi sampai ke pasien hari ini.</p></div></div>
+            <section class="panel"><div id="crud-terkirim"></div></section>
+        </section>
+
+        <section class="page" id="laporan" data-title="Laporan harian">
+            <div class="page-head">
+                <div>
+                    <h1>Laporan harian waiter</h1>
+                    <p>Ringkasan distribusi makanan hari ini berdasarkan data terkini.</p>
+                </div>
+            </div>
+
+            <p class="clinic-section-label">Statistik hari ini</p>
+            <div class="clinic-metrics" data-cols="4">
+                <div class="clinic-metric"><div class="clinic-metric-label">Total antar hari ini</div><div class="clinic-metric-value" id="w-lap-total">Memuat...</div><div class="clinic-metric-note">Siap antar dan terkirim</div></div>
+                <div class="clinic-metric"><div class="clinic-metric-label">Sudah terkirim</div><div class="clinic-metric-value" id="w-lap-terkirim">Memuat...</div><div class="clinic-metric-note">Dikonfirmasi sampai ke pasien</div></div>
+                <div class="clinic-metric"><div class="clinic-metric-label">Belum terkirim</div><div class="clinic-metric-value" id="w-lap-belum">Memuat...</div><div class="clinic-metric-note">Masih dalam antrean</div></div>
+                <div class="clinic-metric"><div class="clinic-metric-label">Rata-rata waktu antar</div><div class="clinic-metric-value" id="w-lap-rata">Memuat...</div><div class="clinic-metric-note">Menit (dari data terkirim)</div></div>
+            </div>
+
+            <div class="grid-wide">
+                <section class="panel">
+                    <div class="panel-head"><div><h2>Distribusi per waktu makan</h2><p>Jumlah porsi berdasarkan waktu makan hari ini.</p></div></div>
+                    <div style="position:relative;height:220px;padding:8px 0;">
+                        <canvas id="chart-waktu-makan"></canvas>
+                    </div>
+                </section>
+                <section class="panel">
+                    <div class="panel-head"><div><h2>Status distribusi</h2><p>Perbandingan terkirim dan belum terkirim.</p></div></div>
+                    <div style="position:relative;height:220px;padding:8px 0;display:flex;align-items:center;justify-content:center;">
+                        <canvas id="chart-status" style="max-width:220px;max-height:220px;"></canvas>
+                    </div>
+                </section>
+            </div>
+
+            <section class="panel" style="margin-top:0;">
+                <div class="panel-head"><div><h2>Ringkasan per ruangan</h2><p>Rekapitulasi distribusi berdasarkan ruangan pasien.</p></div></div>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Ruangan</th><th>Jumlah Porsi</th><th>Sudah Terkirim</th><th>Belum Terkirim</th></tr></thead>
+                        <tbody id="lap-tabel-ruangan"><tr><td colspan="4">Memuat...</td></tr></tbody>
+                    </table>
+                </div>
+            </section>
+        </section>
+
+        <dialog id="konfirmasi-terkirim" class="nc-confirm-dialog" aria-labelledby="konfirmasi-terkirim-title">
+            <form method="dialog" class="nc-confirm-card">
+                <div class="confirm-icon" aria-hidden="true">✓</div>
+                <h2 id="konfirmasi-terkirim-title">Konfirmasi pengantaran</h2>
+                <p id="konfirmasi-terkirim-detail"></p>
+                <div class="confirm-actions">
+                    <button type="button" class="btn btn-ghost" data-confirm-cancel>Batal</button>
+                    <button type="button" class="btn" data-confirm-submit>Ya, sudah diantarkan</button>
+                </div>
+            </form>
+        </dialog>
+
+        <footer class="footer"><span>© 2026 NutriCare, pelayanan gizi terpadu</span><span>Dashboard waiter</span></footer>
+    </main>
+</div>
+<script src="../js/api-adapter.js"></script>
+<script src="../js/nutricare.js"></script>
+<script src="../js/ui-utils.js"></script>
+<script src="../js/api-wrapper.js"></script>
+<script src="../js/notification-center.js"></script>
+<script src="../js/waiter.js"></script>
+<script>
+    // Profile Dropdown Handler
+    (function() {
+        const profileTrigger = document.getElementById('profile-trigger');
+        const profileDropdown = document.getElementById('profile-dropdown');
+        const notificationBell = document.getElementById('notification-bell');
+        const notificationDropdown = document.getElementById('notification-dropdown');
+        const logoutBtn = document.getElementById('logout-btn');
+        
+        if (!profileTrigger || !profileDropdown) return;
+        
+        profileTrigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = profileTrigger.getAttribute('aria-expanded') === 'true';
+            if (isOpen) {
+                profileTrigger.setAttribute('aria-expanded', 'false');
+                profileDropdown.classList.remove('show');
+            } else {
+                if (notificationDropdown) notificationDropdown.classList.remove('show');
+                profileTrigger.setAttribute('aria-expanded', 'true');
+                profileDropdown.classList.add('show');
+            }
+        });
+        
+        if (notificationBell) {
+            notificationBell.addEventListener('click', () => {
+                setTimeout(() => {
+                    if (notificationDropdown && notificationDropdown.classList.contains('show')) {
+                        profileTrigger.setAttribute('aria-expanded', 'false');
+                        profileDropdown.classList.remove('show');
+                    }
+                }, 0);
+            });
+        }
+        
+        document.addEventListener('click', (e) => {
+            if (!profileTrigger.contains(e.target) && !profileDropdown.contains(e.target)) {
+                profileTrigger.setAttribute('aria-expanded', 'false');
+                profileDropdown.classList.remove('show');
+            }
+        });
+        
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                profileTrigger.setAttribute('aria-expanded', 'false');
+                profileDropdown.classList.remove('show');
+            }
+        });
+        
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => {
+                sessionStorage.clear();
+                window.location.href = '../index.html';
+            });
+        }
+    })();
+</script>
+<script src="../js/auto-refresh.js"></script>
+<script src="../js/hms-shell.js"></script>
+</body>
+</html>

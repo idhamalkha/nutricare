@@ -1,0 +1,110 @@
+(function () {
+    'use strict';
+    
+    const roles = {
+        'ahli-gizi': { label: 'Ahli Gizi', avatar: 'G', dashboard: 'ahli-gizi.html' },
+        logistik: { label: 'Logistik & Kepala Dapur', avatar: 'L', dashboard: 'logistik.html' },
+        perawat: { label: 'Perawat ruangan', avatar: 'P', dashboard: 'perawat.html' },
+        waiter: { label: 'Petugas distribusi', avatar: 'W', dashboard: 'waiter.html' }
+    };
+
+    const params = new URLSearchParams(window.location.search);
+    let roleKey = params.get('role');
+    
+    const authToken = sessionStorage.getItem('nutricare-token');
+    
+    // Only redirect if no token AND no role (completely unauthorized)
+    // Allow demo mode with ?role=xxx parameter
+    if (!authToken && !roleKey) {
+        NutriCareUI.warning('Silakan login terlebih dahulu', 'Akses Ditolak');
+        setTimeout(() => { window.location.href = '../index.html'; }, 1500);
+        return;
+    }
+
+    if (!roleKey || !roles[roleKey]) roleKey = 'ahli-gizi';
+    const role = roles[roleKey];
+
+    document.title = 'Pengaturan ' + role.label + ' | NutriCare';
+    document.querySelectorAll('[data-role-label]').forEach(el => { el.textContent = role.label; });
+    const avatarEl = document.querySelector('[data-role-avatar]');
+    if (avatarEl) avatarEl.textContent = role.avatar;
+    const jabatanInput = document.getElementById('pf-jabatan');
+    if (jabatanInput) jabatanInput.value = role.label;
+    const backLink = document.querySelector('[data-back-link]');
+    if (backLink) backLink.href = role.dashboard;
+
+    window.NC.setTheme(localStorage.getItem('nutricare-theme') || 'original');
+    window.NC.today();
+
+    document.querySelectorAll('[data-theme-choice]').forEach(button => {
+        button.addEventListener('click', () => {
+            const themeName = button.getAttribute('data-theme-choice');
+            const theme = window.NC.setTheme(themeName);
+            const themeLabels = { light: 'terang', dark: 'gelap', original: 'original' };
+            NutriCareUI.success('Tema ' + (themeLabels[theme] || theme) + ' diterapkan dan disimpan.', 'Tema Diubah');
+        });
+    });
+
+    async function loadAccount() {
+        try {
+            NutriCareUI.showProgress(30);
+            const userData = await NutriCareAPI.get('/me', { showLoading: false });
+            NutriCareUI.showProgress(60);
+            const prefsData = await NutriCareAPI.get('/me/preferensi', { showLoading: false });
+            NutriCareUI.showProgress(100);
+
+            document.getElementById('pf-nama').value = userData.nama || '';
+            document.getElementById('pf-email').value = userData.email || '';
+            document.getElementById('pf-telepon').value = userData.telepon || '';
+            document.querySelectorAll('[data-user-name]').forEach(el => { el.textContent = userData.nama || role.label; });
+            document.querySelectorAll('[data-pref]').forEach(input => {
+                input.checked = Boolean(prefsData[input.getAttribute('data-pref')]);
+            });
+
+            const profileForm = document.getElementById('form-profil');
+            const passwordForm = document.getElementById('form-sandi');
+            if (profileForm) profileForm.querySelectorAll('input:not([readonly]), button').forEach(el => { el.disabled = true; });
+            if (passwordForm) passwordForm.querySelectorAll('input, button').forEach(el => { el.disabled = true; });
+            document.querySelectorAll('[data-pref]').forEach(input => { input.disabled = true; });
+
+            document.getElementById('pref-msg').textContent = 'Preferensi dibaca dari API. Penyimpanan tidak tersedia untuk mode demo.';
+            const authNotice = document.querySelector('#auth-notice span');
+            if (authNotice) authNotice.textContent = 'Profil berhasil dimuat dari API; perubahan akun belum tersedia pada sesi demo.';
+
+            NutriCareUI.hideProgress();
+        } catch (error) {
+            NutriCareUI.hideProgress();
+            if (error.message !== 'Unauthorized') {
+                NutriCareUI.error('Data akun gagal dimuat. Beberapa fitur mungkin tidak tersedia.');
+            }
+            document.querySelectorAll('form input, form button').forEach(el => { el.disabled = true; });
+        }
+    }
+
+    const resetBtn = document.getElementById('reset-demo');
+    if (resetBtn) {
+        resetBtn.disabled = true;
+        resetBtn.title = 'Reset demo dinonaktifkan untuk keamanan data server';
+        resetBtn.addEventListener('click', () => {
+            NutriCareUI.warning('Reset data demo dinonaktifkan untuk melindungi data server.', 'Fitur Tidak Tersedia');
+        });
+    }
+
+    const profileForm = document.getElementById('form-profil');
+    if (profileForm) {
+        profileForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            NutriCareUI.info('Perubahan profil tidak tersedia dalam mode demo.', 'Mode Demo');
+        });
+    }
+
+    const passwordForm = document.getElementById('form-sandi');
+    if (passwordForm) {
+        passwordForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            NutriCareUI.info('Perubahan password tidak tersedia dalam mode demo.', 'Mode Demo');
+        });
+    }
+
+    loadAccount();
+})();

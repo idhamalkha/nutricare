@@ -1,0 +1,43 @@
+<!-- 🔔 Notification Center Component -->
+<!-- Include this in topbar/header of dashboard pages -->
+
+<div class="notification-center">
+    <button id="notification-bell" class="notification-bell" aria-label="Notifikasi">
+        🔔
+        <span id="notification-badge" class="notification-badge" style="display: none;">0</span>
+    </button>
+
+    <div id="notification-dropdown" class="notification-dropdown">
+        <!-- Header -->
+        <div class="notification-header">
+            <h3>Notifikasi</h3>
+            <div class="notification-actions">
+                <button id="mark-all-read" class="notification-action-btn">
+                    Tandai sudah dibaca
+                </button>
+                <button id="clear-all-notifications" class="notification-action-btn">
+                    Hapus semua
+                </button>
+            </div>
+        </div>
+
+        <!-- List -->
+        <div id="notification-list" class="notification-list">
+            <div class="notification-empty">
+                <div class="notification-empty-icon">🔔</div>
+                <div class="notification-empty-text">Tidak ada notifikasi</div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="notification-footer">
+            <a href="#notifikasi">Lihat semua notifikasi</a>
+        </div>
+    </div>
+</div>
+
+<!-- Required CSS & JS -->
+<!-- Add to <head>: -->
+<!-- <link rel="stylesheet" href="../css/notifications-center.css"> -->
+<!-- Add before </body>: -->
+<!-- <script src="../js/notification-center.js"></script> -->

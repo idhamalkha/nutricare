@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <script src="../js/auth-guard.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil Saya | NutriCare</title>
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/loading.css">
+    <link rel="stylesheet" href="../css/notifications.css">
+    <link rel="stylesheet" href="../css/notifications-center.css">
+    <link rel="stylesheet" href="../css/profile-dropdown.css">
+<link rel="stylesheet" href="../css/hms-clinic.css">
+    <link rel="icon" href="/favicon.ico?v=1" type="image/x-icon">
+</head>
+<body class="clinic">
+<div class="app">
+    <aside class="sidebar">
+        <a href="#" class="brand" data-brand-home>
+            <img class="brand-mark brand-logo" src="../assets/images/logo/legos-transparent.png" alt="">
+            <div>
+                <div class="brand-name">Nutri<span>Care</span></div>
+                <small>Patient Nutrition System</small>
+            </div>
+        </a>
+
+        <div class="sidebar-date today"></div>
+
+        <div class="nav-title">Navigasi</div>
+
+        <nav class="nav">
+            <a href="javascript:history.back()" class="nav-link"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"></path><path d="M12 19l-7-7 7-7"></path></svg></span> Kembali</a>
+            <a href="profil.html" class="nav-link active"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.4"></circle><path d="M4.5 20a7.5 7.5 0 0 1 15 0"></path></svg></span> Profil Saya</a>
+        </nav>
+    </aside>
+
+    <main class="main">
+        <header class="topbar">
+            <div class="crumb">NutriCare / <span data-role-label>Pengguna</span> / <strong>Profil</strong></div>
+            
+            <!-- Notification Bell & Profile Dropdown (pojok kanan) -->
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <!-- Notification Bell -->
+                <div class="notification-center">
+                    <button id="notification-bell" class="notification-bell" aria-label="Notifikasi">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                        </svg>
+                        <span id="notification-badge" class="notification-badge" style="display: none;"></span>
+                    </button>
+                    <div id="notification-dropdown" class="notification-dropdown">
+                        <div class="notification-header">
+                            <h3>Notifikasi</h3>
+                            <span id="notification-count" class="notification-count" hidden></span>
+                            <div class="notification-actions">
+                                <button id="mark-all-read" class="notification-action-btn">Tandai sudah dibaca</button>
+                                <button id="clear-all-notifications" class="notification-action-btn">Hapus semua</button>
+                            </div>
+                        </div>
+                        <div id="notification-list" class="notification-list">
+                            <div class="notification-empty">
+                                <div class="notification-empty-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg></div>
+                                <div class="notification-empty-text">Tidak ada notifikasi</div>
+                            </div>
+                        </div>
+                        <p class="notification-hint">Klik notifikasi untuk melihat rinciannya.</p>
+                    </div>
+                </div>
+                
+                <!-- Profile Dropdown -->
+                <div style="position: relative;">
+                    <button id="profile-trigger" class="profile-trigger" aria-haspopup="menu" aria-expanded="false">
+                        <div class="avatar" data-role-avatar>U</div>
+                        <div class="profile-info">
+                            <div class="profile-name" data-user-name>pengguna</div>
+                            <div class="profile-role" data-role-label>Pengguna</div>
+                        </div>
+                        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </button>
+                    
+                    <div id="profile-dropdown" class="profile-dropdown" role="menu">
+                        <a href="profil.html" class="profile-dropdown-item active" role="menuitem">
+                            <svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                            <span>Profil</span>
+                        </a>
+                        <a href="pengaturan.html" class="profile-dropdown-item" role="menuitem">
+                            <svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <path d="M12 1v6m0 6v6m-5-13.66L9.5 8.5m8.66 3.5l-3.16 3.16m3.16 3.16L14.5 15.5M5.34 5.34L8.5 8.5M1 12h6m6 0h6"></path>
+                            </svg>
+                            <span>Pengaturan</span>
+                        </a>
+                        <div class="profile-dropdown-divider"></div>
+                        <button id="logout-btn" class="profile-dropdown-item danger" role="menuitem">
+                            <svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                <polyline points="16 17 21 12 16 7"></polyline>
+                                <line x1="21" y1="12" x2="9" y2="12"></line>
+                            </svg>
+                            <span>Keluar</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="page-head">
+            <div><h1>Profil Saya</h1><p>Informasi akun dan keamanan</p></div>
+        </div>
+
+        <div class="grid-2">
+            <!-- Data Profil (Read-only) -->
+            <section class="panel">
+                <div class="panel-head"><div><h2>Informasi Akun</h2><p>Data profil Anda yang terdaftar dalam sistem</p></div></div>
+                <div class="profile-photo-row">
+                    <div class="profile-photo" data-photo-avatar aria-hidden="true">U</div>
+                    <div class="profile-photo-meta">
+                        <strong data-photo-name>Pengguna</strong>
+                        <small>Foto profil hanya dapat diubah oleh admin.</small>
+                    </div>
+                </div>
+                <div class="form-grid" id="profil-data">
+                    <div class="field full">
+                        <label>Nama Lengkap</label>
+                        <input type="text" id="view-nama" readonly>
+                    </div>
+                    <div class="field">
+                        <label>Email</label>
+                        <input type="email" id="view-email" readonly>
+                    </div>
+                    <div class="field">
+                        <label>Nomor Telepon</label>
+                        <input type="tel" id="view-telepon" readonly placeholder="Tidak ada">
+                    </div>
+                    <div class="field full">
+                        <label>Peran</label>
+                        <input type="text" id="view-jabatan" readonly>
+                    </div>
+                    <div class="field">
+                        <label>User ID</label>
+                        <input type="text" id="view-id" readonly>
+                    </div>
+                    <div class="field">
+                        <label>Terdaftar Sejak</label>
+                        <input type="text" id="view-created" readonly>
+                    </div>
+                </div>
+                <div class="notice" style="margin-top: 16px;">
+                    <strong>Informasi</strong>
+                    Data profil hanya dapat diubah oleh administrator sistem. Hubungi admin jika ada perubahan yang perlu dilakukan.
+                </div>
+            </section>
+
+            <!-- Ganti Password -->
+            <section class="panel">
+                <div class="panel-head"><div><h2>Keamanan Akun</h2><p>Ubah password Anda secara berkala untuk keamanan</p></div></div>
+                <form id="form-sandi" novalidate>
+                    <div class="form-grid">
+                        <div class="field full">
+                            <label for="pw-lama">Password Lama</label>
+                            <input id="pw-lama" name="old_password" type="password" autocomplete="current-password" required>
+                        </div>
+                        <div class="field">
+                            <label for="pw-baru">Password Baru</label>
+                            <input id="pw-baru" name="new_password" type="password" autocomplete="new-password" minlength="8" required>
+                            <small>Minimal 8 karakter</small>
+                        </div>
+                        <div class="field">
+                            <label for="pw-konfirmasi">Konfirmasi Password Baru</label>
+                            <input id="pw-konfirmasi" name="confirm_password" type="password" autocomplete="new-password" required>
+                        </div>
+                    </div>
+                    <div class="form-msg" role="alert"></div>
+                    <div class="form-actions"><button type="submit" class="btn">Ubah Password</button></div>
+                </form>
+                <div class="notice warn" style="margin-top: 16px;">
+                    <strong>Perhatian</strong>
+                    Setelah password berhasil diubah, Anda akan otomatis logout dan harus login kembali dengan password baru.
+                </div>
+            </section>
+        </div>
+
+        <div id="auth-notice" class="alert alert-info" style="margin-top: 24px;">
+            <span>Memuat data profil...</span>
+        </div>
+
+        <footer class="footer"><span>© 2026 NutriCare, pelayanan gizi terpadu</span><span>Profil pengguna</span></footer>
+    </main>
+</div>
+<script src="../js/ui-utils.js"></script>
+<script src="../js/api-adapter.js"></script>
+    <script src="../js/api-wrapper.js"></script>
+<script src="../js/notification-center.js"></script>
+<script src="../js/nutricare.js"></script>
+<script>
+    // Auth check
+    const urlParams = new URLSearchParams(window.location.search);
+    const demoRole = urlParams.get('role');
+    const token = sessionStorage.getItem('nutricare-token');
+    
+    if (!token && !demoRole) {
+        window.location.href = '../index.html';
+    }
+
+    // Tanggal hari ini di sidebar
+    if (window.NC && typeof NC.today === 'function') NC.today();
+
+    // Logo sidebar mengarah ke dashboard sesuai peran (bukan halaman login)
+    (function () {
+        var dashboards = {
+            'ahli-gizi': 'ahli-gizi.html',
+            dapur: 'dapur.html',
+            logistik: 'logistik.html',
+            perawat: 'perawat.html',
+            waiter: 'waiter.html'
+        };
+        var brand = document.querySelector('[data-brand-home]');
+        if (!brand) return;
+
+        var stored = {};
+        try { stored = JSON.parse(sessionStorage.getItem('nutricare-user') || '{}'); } catch (e) { stored = {}; }
+        var role = demoRole || stored.role || '';
+        brand.setAttribute('href', dashboards[role] || 'ahli-gizi.html');
+    })();
+
+    // Load user data
+    async function loadUserData() {
+        try {
+            if (window.NutriCareUI) NutriCareUI.showProgress(30);
+            const userData = await NutriCareAPI.get('/me', { showLoading: false });
+            if (window.NutriCareUI) NutriCareUI.showProgress(100);
+
+            document.getElementById('view-nama').value = userData.nama || '';
+            document.getElementById('view-email').value = userData.email || '';
+            document.getElementById('view-telepon').value = userData.telepon || '';
+            document.getElementById('view-jabatan').value = userData.role || '';
+            document.getElementById('view-id').value = userData.id || '';
+            
+            // Format created_at date
+            if (userData.created_at) {
+                const date = new Date(userData.created_at);
+                document.getElementById('view-created').value = date.toLocaleDateString('id-ID', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+            }
+
+            // Update topbar
+            document.querySelectorAll('[data-user-name]').forEach(el => { 
+                el.textContent = userData.nama; 
+            });
+
+            // Foto profil (hanya baca)
+            const photoEl = document.querySelector('[data-photo-avatar]');
+            const initial = (userData.nama || '?').trim().charAt(0).toUpperCase() || '?';
+            if (photoEl) {
+                photoEl.dataset.initial = initial;
+                if (!userData.foto_profil) photoEl.textContent = initial;
+            }
+            const photoName = document.querySelector('[data-photo-name]');
+            if (photoName) photoName.textContent = userData.nama || 'Pengguna';
+            if (window.NC && typeof NC.applyProfilePhoto === 'function') {
+                NC.applyProfilePhoto(userData.foto_profil || null);
+            }
+            
+            const authNotice = document.querySelector('#auth-notice span');
+            if (authNotice) authNotice.textContent = 'Data profil berhasil dimuat';
+
+            if (window.NutriCareUI) NutriCareUI.hideProgress();
+        } catch (error) {
+            if (window.NutriCareUI) NutriCareUI.hideProgress();
+            if (error.message !== 'Unauthorized') {
+                if (window.NutriCareUI) {
+                    NutriCareUI.error('Data profil gagal dimuat. Beberapa fitur mungkin tidak tersedia.');
+                }
+            }
+            document.querySelectorAll('#profil-data input, #form-sandi input, #form-sandi button').forEach(el => { 
+                el.disabled = true; 
+            });
+
+            // Tetap tampilkan identitas dari sesi agar tidak kosong saat API tidak tersedia.
+            try {
+                const stored = JSON.parse(sessionStorage.getItem('nutricare-user') || '{}');
+                const roleLabels = {
+                    'ahli-gizi': 'Ahli Gizi',
+                    perawat: 'Perawat',
+                    waiter: 'Pramusaji',
+                    logistik: 'Petugas Logistik'
+                };
+                const displayName = stored.nama || roleLabels[demoRole || stored.role] || 'Pengguna';
+
+                document.querySelectorAll('[data-user-name]').forEach(el => {
+                    el.textContent = displayName;
+                });
+
+                const initial = displayName.trim().charAt(0).toUpperCase() || '?';
+                document.querySelectorAll('[data-role-avatar], [data-photo-avatar]').forEach(el => {
+                    if (el.querySelector('img')) return;
+                    el.dataset.initial = initial;
+                    el.textContent = initial;
+                });
+
+                const photoName = document.querySelector('[data-photo-name]');
+                if (photoName) photoName.textContent = displayName;
+            } catch (e) { /* abaikan */ }
+        }
+    }
+
+    // Password form handler
+    const passwordForm = document.getElementById('form-sandi');
+    if (passwordForm) {
+        passwordForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = passwordForm.querySelector('button[type="submit"]');
+            const msgDiv = passwordForm.querySelector('.form-msg');
+            const oldPassword = document.getElementById('pw-lama').value;
+            const newPassword = document.getElementById('pw-baru').value;
+            const confirmPassword = document.getElementById('pw-konfirmasi').value;
+
+            msgDiv.textContent = '';
+            msgDiv.className = 'form-msg';
+
+            if (!oldPassword) {
+                msgDiv.textContent = 'Password lama wajib diisi';
+                msgDiv.className = 'form-msg error';
+                return;
+            }
+            if (!newPassword) {
+                msgDiv.textContent = 'Password baru wajib diisi';
+                msgDiv.className = 'form-msg error';
+                return;
+            }
+            if (newPassword.length < 8) {
+                msgDiv.textContent = 'Password baru minimal 8 karakter';
+                msgDiv.className = 'form-msg error';
+                return;
+            }
+            if (newPassword !== confirmPassword) {
+                msgDiv.textContent = 'Konfirmasi password tidak cocok';
+                msgDiv.className = 'form-msg error';
+                return;
+            }
+
+            try {
+                if (window.NutriCareUI) NutriCareUI.buttonLoading(submitBtn);
+                
+                await NutriCareAPI.patch('/me/password', {
+                    old_password: oldPassword,
+                    new_password: newPassword
+                }, {
+                    showLoading: false,
+                    showSuccess: false
+                });
+
+                passwordForm.reset();
+                msgDiv.textContent = 'Password berhasil diubah. Anda akan logout dalam 3 detik...';
+                msgDiv.className = 'form-msg success';
+                
+                if (window.NutriCareUI) {
+                    NutriCareUI.success('Password berhasil diubah. Silakan login ulang dengan password baru.', 'Berhasil');
+                }
+                
+                setTimeout(() => {
+                    sessionStorage.clear();
+                    window.location.href = '../index.html';
+                }, 3000);
+            } catch (error) {
+                msgDiv.textContent = error.message || 'Gagal mengubah password';
+                msgDiv.className = 'form-msg error';
+                if (window.NutriCareUI) {
+                    NutriCareUI.error(error.message || 'Gagal mengubah password', 'Terjadi Kesalahan');
+                }
+                if (window.NutriCareUI) NutriCareUI.buttonReady(submitBtn);
+            }
+        });
+    }
+
+    // Profile Dropdown Handler
+    (function() {
+        const profileTrigger = document.getElementById('profile-trigger');
+        const profileDropdown = document.getElementById('profile-dropdown');
+        const notificationBell = document.getElementById('notification-bell');
+        const notificationDropdown = document.getElementById('notification-dropdown');
+        const logoutBtn = document.getElementById('logout-btn');
+        
+        if (!profileTrigger || !profileDropdown) return;
+        
+        profileTrigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = profileTrigger.getAttribute('aria-expanded') === 'true';
+            if (isOpen) {
+                profileTrigger.setAttribute('aria-expanded', 'false');
+                profileDropdown.classList.remove('show');
+            } else {
+                if (notificationDropdown) notificationDropdown.classList.remove('show');
+                profileTrigger.setAttribute('aria-expanded', 'true');
+                profileDropdown.classList.add('show');
+            }
+        });
+        
+        if (notificationBell) {
+            notificationBell.addEventListener('click', () => {
+                setTimeout(() => {
+                    if (notificationDropdown && notificationDropdown.classList.contains('show')) {
+                        profileTrigger.setAttribute('aria-expanded', 'false');
+                        profileDropdown.classList.remove('show');
+                    }
+                }, 0);
+            });
+        }
+        
+        document.addEventListener('click', (e) => {
+            if (!profileTrigger.contains(e.target) && !profileDropdown.contains(e.target)) {
+                profileTrigger.setAttribute('aria-expanded', 'false');
+                profileDropdown.classList.remove('show');
+            }
+        });
+        
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                profileTrigger.setAttribute('aria-expanded', 'false');
+                profileDropdown.classList.remove('show');
+            }
+        });
+        
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => {
+                sessionStorage.clear();
+                window.location.href = '../index.html';
+            });
+        }
+    })();
+
+    // Load data on page ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', loadUserData);
+    } else {
+        loadUserData();
+    }
+</script>
+<script src="../js/hms-shell.js"></script>
+</body>
+</html>

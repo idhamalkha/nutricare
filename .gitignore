@@ -1,0 +1,17 @@
+node_modules/
+dist/
+.env
+.env.local
+*.log
+.DS_Store
+coverage/
+server/node_modules/
+server/dist/
+server/.env
+server/.env.*
+.env.*
+!.env.example
+KREDENSIAL*
+debug-token.html
+supabase/.branches/
+supabase/.temp/
