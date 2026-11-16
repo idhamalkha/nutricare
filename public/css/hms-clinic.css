@@ -1480,6 +1480,9 @@ body.clinic .alert-info {
     body.clinic .app,
     body.clinic .app.layout { z-index: auto; }
 
+    /* dashboard.css (<=720px) membuat .nav 2 kolom untuk kulit lama; laci harus satu kolom. */
+    body.clinic .sidebar .nav { grid-template-columns: minmax(0, 1fr); }
+
     body.clinic .topbar { gap: 8px; }
 
     body.clinic .nav-toggle {
