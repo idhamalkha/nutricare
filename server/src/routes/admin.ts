@@ -5,6 +5,7 @@ import { config } from '../config.js';
 import { ValidationError, NotFoundError } from '../http/errors.js';
 import { pool } from '../db/pool.js';
 import { assertAdminKey } from '../auth/admin-key.js';
+import { isNutricareRole, NUTRICARE_ROLES } from '../auth/index.js';
 
 const admin = createClient(config.supabase.url, config.supabase.serviceRoleKey);
 
@@ -33,9 +34,9 @@ const adminRoutes: FastifyPluginAsync = async (fastify) => {
         SELECT p.id, p.nama, p.role, p.telepon, p.aktif, p.foto_profil, u.email
         FROM profiles p
         LEFT JOIN auth.users u ON u.id = p.id
-        WHERE p.role NOT IN ('perawat', 'dokter')
+        WHERE p.role = ANY($1::text[])
         ORDER BY p.created_at DESC
-      `);
+      `, [[...NUTRICARE_ROLES]]);
 
       return { users: result.rows };
     } catch (error) {
@@ -58,7 +59,7 @@ const adminRoutes: FastifyPluginAsync = async (fastify) => {
       throw new ValidationError('Password minimal 8 karakter');
     }
 
-    if (!['ahli-gizi', 'waiter', 'logistik', 'dapur'].includes(role)) {
+    if (!isNutricareRole(role)) {
       throw new ValidationError('Role tidak valid');
     }
 
@@ -152,7 +153,7 @@ const adminRoutes: FastifyPluginAsync = async (fastify) => {
         throw new ValidationError('Nama dan role wajib diisi');
       }
 
-      if (!['ahli-gizi', 'waiter', 'logistik', 'dapur'].includes(role)) {
+      if (!isNutricareRole(role)) {
         throw new ValidationError('Role tidak valid');
       }
 
@@ -164,7 +165,7 @@ const adminRoutes: FastifyPluginAsync = async (fastify) => {
       if (currentProfile.rowCount === 0) {
         throw new NotFoundError('Pengguna tidak ditemukan');
       }
-      if (currentProfile.rows[0].role === 'perawat' || currentProfile.rows[0].role === 'dokter') {
+      if (!isNutricareRole(currentProfile.rows[0].role)) {
         return reply.status(403).send({
           success: false,
           error: 'Akun Perawat/Dokter dikelola melalui Nadi.',
@@ -218,7 +219,7 @@ const adminRoutes: FastifyPluginAsync = async (fastify) => {
     if (currentProfile.rowCount === 0) {
       throw new NotFoundError('Pengguna tidak ditemukan');
     }
-    if (currentProfile.rows[0].role === 'perawat' || currentProfile.rows[0].role === 'dokter') {
+    if (!isNutricareRole(currentProfile.rows[0].role)) {
       return reply.status(403).send({
         success: false,
         error: 'Akun Perawat/Dokter dikelola melalui Nadi.',

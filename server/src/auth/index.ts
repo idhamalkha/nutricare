@@ -24,13 +24,20 @@ export type AuthUser = {
   email?: string;
 };
 
+// Satu-satunya sumber daftar role yang boleh masuk NutriCare. Role di luar daftar ditolak.
+export const NUTRICARE_ROLES = ['ahli-gizi', 'waiter', 'logistik', 'dapur'] as const;
+
+export function isNutricareRole(role: unknown): role is (typeof NUTRICARE_ROLES)[number] {
+  return typeof role === 'string' && (NUTRICARE_ROLES as readonly string[]).includes(role);
+}
+
 // Mode demo: baca role dari header X-NC-Role
 export function getDemoUser(roleHeader: string | undefined): AuthUser {
   if (!roleHeader) {
     throw new UnauthorizedError('Header X-NC-Role wajib diisi.');
   }
   
-  const validRoles = ['ahli-gizi', 'waiter', 'logistik', 'dapur'];
+  const validRoles: readonly string[] = NUTRICARE_ROLES;
   if (!validRoles.includes(roleHeader)) {
     throw new UnauthorizedError('Role tidak valid untuk NutriCare. Perawat dan Dokter silakan gunakan aplikasi Nadi.');
   }
@@ -71,8 +78,8 @@ export async function getAuthUser(token: string): Promise<AuthUser> {
   
   const profile = result.rows[0];
   
-  if (profile.role === 'perawat' || profile.role === 'dokter') {
-    throw new UnauthorizedError('Akun Perawat/Dokter harus mengakses aplikasi Nadi, bukan NutriCare.');
+  if (!isNutricareRole(profile.role)) {
+    throw new UnauthorizedError('Akun ini tidak dapat masuk ke NutriCare. Perawat dan Dokter silakan gunakan aplikasi Nadi.');
   }
 
   const user: AuthUser = {
@@ -116,6 +123,10 @@ export async function login(params: {
   
   const profile = result.rows[0];
   
+  if (!isNutricareRole(profile.role)) {
+    throw new UnauthorizedError('Akun ini tidak dapat masuk ke NutriCare. Perawat dan Dokter silakan gunakan aplikasi Nadi.');
+  }
+
   const email = profile.email;
   if (!email) throw new UnauthorizedError('Email akun tidak tersedia.');
 

@@ -8,6 +8,7 @@ import { pool } from '../db/pool.js';
 import { config } from '../config.js';
 import { AppError, NotFoundError, ValidationError } from '../http/errors.js';
 import { assertAdminKey } from '../auth/admin-key.js';
+import { isNutricareRole } from '../auth/index.js';
 import {
   buildFilename,
   deleteProfilePhoto,
@@ -35,7 +36,7 @@ async function findProfile(
   }
 
   const profile = result.rows[0];
-  if (profile.role === 'perawat' || profile.role === 'dokter') {
+  if (!isNutricareRole(profile.role)) {
     throw new AppError(403, 'Akun Perawat/Dokter dikelola melalui Nadi.', 'USER_MANAGED_BY_NADI');
   }
   return profile;

@@ -19,7 +19,7 @@ export interface NotificationItem {
 // popup berisi data nyata (pasien baru, rekomendasi menu, kesiapan dapur) tanpa
 // harus membuka halaman lain lebih dulu.
 export interface NotificationDetail {
-  kind: 'pasien' | 'rekomendasi' | 'distribusi' | 'dapur' | 'umum';
+  kind: 'pasien' | 'rekomendasi' | 'distribusi' | 'dapur' | 'evaluasi' | 'umum';
   ringkas?: string;
   fields?: NotificationField[];
   items?: NotificationItem[];

@@ -1,6 +1,9 @@
 (function () {
     'use strict';
     
+    // Harus sama dengan NUTRICARE_ROLES di server/src/auth/index.ts.
+    const ALLOWED_ROLES = ['ahli-gizi', 'waiter', 'logistik', 'dapur'];
+
     const form = document.getElementById('login-form');
     if (!form) return;
 
@@ -64,6 +67,11 @@
 
             if (!response.ok || !result.token || !result.user) {
                 throw new Error(result.message || 'Login gagal. Periksa informasi akun Anda.');
+            }
+
+            // Role di luar daftar ditolak sebelum sesi disimpan.
+            if (ALLOWED_ROLES.indexOf(result.user.role) === -1) {
+                throw new Error('Akun ini tidak dapat masuk ke NutriCare. Perawat dan Dokter silakan gunakan aplikasi Nadi.');
             }
 
             // Success
