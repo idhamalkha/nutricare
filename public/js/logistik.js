@@ -243,12 +243,23 @@
     }
     box.innerHTML = rows.map(renderer).join('');
   }
+  let expFilter = 'semua';
   function bindBahanCards() {
     const cards = document.getElementById('bahan-cards');
     const search = document.getElementById('cari-data-bahan');
+    const expBox = document.getElementById('filter-kedaluwarsa');
     if (search && !search.dataset.bound) {
       search.dataset.bound = 'true';
       search.addEventListener('input', () => renderBahanCards());
+    }
+    if (expBox && !expBox.dataset.bound) {
+      expBox.dataset.bound = 'true';
+      expBox.addEventListener('click', (event) => {
+        const chip = event.target.closest('[data-exp-filter]');
+        if (!chip) return;
+        expFilter = chip.dataset.expFilter;
+        renderBahanCards();
+      });
     }
     if (cards && !cards.dataset.bound) {
       cards.dataset.bound = 'true';
@@ -286,18 +297,48 @@
       });
     }
   }
+  function statusKedaluwarsa(item, today, batas) {
+    const tgl = String(item.kedaluwarsa || '').slice(0, 10);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(tgl)) return 'tanpa';
+    if (tgl < today) return 'kedaluwarsa';
+    if (tgl <= batas) return 'segera';
+    return 'aman';
+  }
   function renderBahanCards() {
     const query = (document.getElementById('cari-data-bahan')?.value || '').trim().toLocaleLowerCase('id');
-    const filtered = bahanCache.filter((item) => !query || [item.nama, item.kategori, item.satuan].some((value) => String(value || '').toLocaleLowerCase('id').includes(query)));
+    const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Jakarta' }).format(new Date());
+    const batasDate = new Date(today + 'T00:00:00Z');
+    batasDate.setUTCDate(batasDate.getUTCDate() + 30);
+    const batas = batasDate.toISOString().slice(0, 10);
+    const cocokCari = bahanCache.filter((item) => !query || [item.nama, item.kategori, item.satuan].some((value) => String(value || '').toLocaleLowerCase('id').includes(query)));
+    const counts = { semua: cocokCari.length, kedaluwarsa: 0, segera: 0, tanpa: 0 };
+    cocokCari.forEach((item) => { const s = statusKedaluwarsa(item, today, batas); if (counts[s] !== undefined) counts[s]++; });
+    document.querySelectorAll('[data-exp-count]').forEach((el) => { el.textContent = String(counts[el.dataset.expCount] ?? 0); });
+    document.querySelectorAll('[data-exp-filter]').forEach((chip) => {
+      const aktif = chip.dataset.expFilter === expFilter;
+      chip.classList.toggle('is-active', aktif);
+      chip.setAttribute('aria-pressed', aktif ? 'true' : 'false');
+    });
+    let filtered = expFilter === 'semua' ? cocokCari : cocokCari.filter((item) => statusKedaluwarsa(item, today, batas) === expFilter);
+    if (expFilter === 'kedaluwarsa' || expFilter === 'segera') {
+      filtered = filtered.slice().sort((a, b) => String(a.kedaluwarsa).slice(0, 10).localeCompare(String(b.kedaluwarsa).slice(0, 10)));
+    }
+    const pesanKosong = expFilter === 'kedaluwarsa' ? 'Tidak ada bahan yang sudah kedaluwarsa.'
+      : expFilter === 'segera' ? 'Tidak ada bahan yang akan kedaluwarsa dalam 30 hari.'
+      : expFilter === 'tanpa' ? 'Semua bahan sudah punya tanggal kedaluwarsa.'
+      : (query ? 'Tidak ada bahan yang cocok dengan pencarian.' : 'Belum ada bahan di server.');
     setCards('#bahan-cards', filtered, (item) => {
       const menipis = Number(item.stok) <= Number(item.minimum);
       const statusBahan = Number(item.stok) <= 0 ? 'Habis' : (menipis ? 'Menipis' : 'Aman');
-      return `<article class="data-card${menipis ? ' is-low' : ''}${Number(item.stok) <= 0 ? ' is-empty' : ''}">`
+      const exp = statusKedaluwarsa(item, today, batas);
+      const expClass = exp === 'kedaluwarsa' ? ' is-expired' : (exp === 'segera' ? ' is-expiring' : '');
+      const expLabel = exp === 'kedaluwarsa' ? ' <small class="exp-flag">(Kedaluwarsa)</small>' : (exp === 'segera' ? ' <small class="exp-flag exp-flag-warn">(Segera)</small>' : '');
+      return `<article class="data-card${menipis ? ' is-low' : ''}${Number(item.stok) <= 0 ? ' is-empty' : ''}${expClass}">`
         + `<div class="data-card-top"><h3>${esc(item.nama)}</h3>${badge(statusBahan)}</div>`
         + `<p class="data-card-sub">${esc(item.kategori)}</p>`
-        + `<div class="data-card-meta"><div><span>Stok</span><b>${esc(item.stok)} ${esc(item.satuan)}</b></div><div><span>Minimum</span><b>${esc(item.minimum)} ${esc(item.satuan)}</b></div><div><span>Kedaluwarsa</span><b>${date(item.kedaluwarsa)}</b></div></div>`
+        + `<div class="data-card-meta"><div><span>Stok</span><b>${esc(item.stok)} ${esc(item.satuan)}</b></div><div><span>Minimum</span><b>${esc(item.minimum)} ${esc(item.satuan)}</b></div><div><span>Kedaluwarsa</span><b>${date(item.kedaluwarsa)}${expLabel}</b></div></div>`
         + `<div class="data-card-actions"><button type="button" class="button button-secondary button-sm" data-bahan-edit="${esc(item.id)}">Edit</button> <button type="button" class="button button-secondary button-sm" data-bahan-delete="${esc(item.id)}">Hapus</button></div></article>`;
-    }, query ? 'Tidak ada bahan yang cocok dengan pencarian.' : 'Belum ada bahan di server.');
+    }, pesanKosong);
   }
   function setRows(selector, rows, renderer) {
     const tbody = document.querySelector(selector);
