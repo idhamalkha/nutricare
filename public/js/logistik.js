@@ -332,7 +332,7 @@
       const statusBahan = Number(item.stok) <= 0 ? 'Habis' : (menipis ? 'Menipis' : 'Aman');
       const exp = statusKedaluwarsa(item, today, batas);
       const expClass = exp === 'kedaluwarsa' ? ' is-expired' : (exp === 'segera' ? ' is-expiring' : '');
-      const expLabel = exp === 'kedaluwarsa' ? ' <small class="exp-flag">(Kedaluwarsa)</small>' : (exp === 'segera' ? ' <small class="exp-flag exp-flag-warn">(Segera)</small>' : '');
+      const expLabel = exp === 'kedaluwarsa' ? '<small class="exp-flag">Kedaluwarsa</small>' : (exp === 'segera' ? '<small class="exp-flag exp-flag-warn">Segera</small>' : '');
       return `<article class="data-card${menipis ? ' is-low' : ''}${Number(item.stok) <= 0 ? ' is-empty' : ''}${expClass}">`
         + `<div class="data-card-top"><h3>${esc(item.nama)}</h3>${badge(statusBahan)}</div>`
         + `<p class="data-card-sub">${esc(item.kategori)}</p>`

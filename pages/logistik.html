@@ -823,7 +823,7 @@ body[data-theme="light"] #modal-bahan .form-field select option { background-col
 .exp-chip-warn:not(.is-active) { color:#b54708; border-color:color-mix(in srgb, #b54708 40%, var(--border)); }
 .data-card.is-expired { border-color:color-mix(in srgb, #b42318 55%, var(--border)); }
 .data-card.is-expiring { border-color:color-mix(in srgb, #b54708 55%, var(--border)); }
-.data-card-meta .exp-flag { color:#b42318; }
+.data-card-meta .exp-flag { display:block; margin-top:2px; color:#b42318; font-size:10px; font-weight:700; letter-spacing:.02em; text-align:right; white-space:nowrap; }
 .data-card-meta .exp-flag-warn { color:#b54708; }
 .data-card-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; width: 100%; }
 .data-card-actions .button { min-width: 0; min-height: 42px; padding: 9px 6px; font-size: 10px; white-space: nowrap; }
@@ -1350,7 +1350,7 @@ body[data-theme="light"] #modal-bahan .form-field select option { background-col
                     <div class="exp-filter" id="filter-kedaluwarsa" role="group" aria-label="Filter kedaluwarsa">
                         <button type="button" class="exp-chip is-active" data-exp-filter="semua" aria-pressed="true">Semua <span data-exp-count="semua">0</span></button>
                         <button type="button" class="exp-chip exp-chip-danger" data-exp-filter="kedaluwarsa" aria-pressed="false">Kedaluwarsa <span data-exp-count="kedaluwarsa">0</span></button>
-                        <button type="button" class="exp-chip exp-chip-warn" data-exp-filter="segera" aria-pressed="false">Segera (â‰¤ 30 hari) <span data-exp-count="segera">0</span></button>
+                        <button type="button" class="exp-chip exp-chip-warn" data-exp-filter="segera" aria-pressed="false">Segera (&le; 30 hari) <span data-exp-count="segera">0</span></button>
                         <button type="button" class="exp-chip" data-exp-filter="tanpa" aria-pressed="false">Tanpa tanggal <span data-exp-count="tanpa">0</span></button>
                     </div>
                 </div>
