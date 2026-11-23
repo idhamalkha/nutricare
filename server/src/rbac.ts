@@ -2,13 +2,14 @@
 // Matriks izin sesuai 01-analisis-frontend.md bagian 6
 // C = Create, R = Read, U = Update, D = Delete, A = Action khusus
 
-type Role = 'ahli-gizi' | 'perawat' | 'waiter' | 'logistik' | 'dapur';
+type Role = 'ahli-gizi' | 'waiter' | 'logistik' | 'dapur';
 type Resource = 'pasien' | 'pantangan' | 'rekomendasi' | 'jadwal' | 'perawat' | 'bahan' | 'logistik';
 type Permission = 'create' | 'read' | 'update' | 'delete' | 'action';
 
 import { ForbiddenError } from './http/errors.js';
 
 // Matriks izin (tabel konfigurasi)
+// Catatan: Role Perawat dan Dokter kini berada di aplikasi Nadi
 const permissions: Record<Role, Record<Resource, Permission[]>> = {
   'ahli-gizi': {
     pasien: ['create', 'read', 'update', 'delete'],
@@ -18,17 +19,6 @@ const permissions: Record<Role, Record<Resource, Permission[]>> = {
     perawat: ['create', 'read', 'update', 'delete', 'action'], // action = Tandai ditinjau
     bahan: ['create', 'read', 'update', 'delete'],
     logistik: ['read'], // Baca laporan/ringkasan saja
-  },
-  perawat: {
-    // Perawat menginput sekaligus memelihara data pasien dan catatan
-    // alergi/pantangan, termasuk membuang data yang salah input.
-    pasien: ['create', 'read', 'update', 'delete'],
-    pantangan: ['create', 'read', 'update', 'delete'],
-    rekomendasi: ['read'],
-    jadwal: ['read'],
-    perawat: ['create', 'read', 'update', 'delete'], // laporan kondisi
-    bahan: [],
-    logistik: [],
   },
   waiter: {
     pasien: [],

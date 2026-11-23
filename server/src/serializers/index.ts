@@ -40,6 +40,7 @@ export function serializeRekomendasi(row: any) {
     komposisi: row.komposisi,
     catatan: row.catatan,
     status: row.status,
+    dokter: row.dokter_nama ?? null,
   };
 }
 

@@ -175,7 +175,7 @@ Belum ada JavaScript, tetapi tabel dan formulirnya menunjukkan bentuk data yang 
 
 ## 9. Login (`index.html`)
 
-- Input: `role` (`logistik`, `ahli-gizi`, `perawat`, `waiter`), `username` (username atau email), `password`, `remember`.
+- Input: `role` (`logistik`, `ahli-gizi`, `waiter`, `dapur`), `username` (username atau email), `password`, `remember`. Akun Perawat dan Dokter menggunakan aplikasi Nadi.
 - Saat ini tidak ada verifikasi; tautan "dashboard demo" membuka halaman **tanpa login**.
 
 ## 10. Temuan dan dampaknya ke backend

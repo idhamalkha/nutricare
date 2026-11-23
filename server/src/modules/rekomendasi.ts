@@ -101,9 +101,19 @@ export async function resolveMenuComposition(menu: string): Promise<string> {
 
 export async function getAllRekomendasi() {
   const result = await pool.query(
-    `SELECT r.*, p.nama as pasien_nama, p.ruangan
+    `SELECT r.*, p.nama as pasien_nama, p.ruangan, dr.dokter_nama
      FROM rekomendasi_menu r
      JOIN pasien p ON p.id = r.pasien_id
+     LEFT JOIN LATERAL (
+       SELECT pf.nama AS dokter_nama
+       FROM pasien_rs prs
+       JOIN kunjungan k ON k.pasien_rs_id = prs.id AND k.deleted_at IS NULL
+       JOIN rekam_medis rm ON rm.kunjungan_id = k.id AND rm.final_oleh IS NOT NULL
+       JOIN profiles pf ON pf.id = rm.final_oleh
+       WHERE lower(prs.rm) = lower(p.rm) AND prs.deleted_at IS NULL
+       ORDER BY rm.final_at DESC NULLS LAST, rm.created_at DESC
+       LIMIT 1
+     ) dr ON true
      WHERE r.deleted_at IS NULL AND p.deleted_at IS NULL
      ORDER BY r.tanggal DESC, r.created_at DESC`
   );

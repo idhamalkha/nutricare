@@ -19,7 +19,7 @@ const supabase = createClient(
 
 export type AuthUser = {
   id: string;
-  role: 'ahli-gizi' | 'perawat' | 'waiter' | 'logistik' | 'dapur';
+  role: 'ahli-gizi' | 'waiter' | 'logistik' | 'dapur';
   nama: string;
   email?: string;
 };
@@ -30,16 +30,15 @@ export function getDemoUser(roleHeader: string | undefined): AuthUser {
     throw new UnauthorizedError('Header X-NC-Role wajib diisi.');
   }
   
-  const validRoles = ['ahli-gizi', 'perawat', 'waiter', 'logistik', 'dapur'];
+  const validRoles = ['ahli-gizi', 'waiter', 'logistik', 'dapur'];
   if (!validRoles.includes(roleHeader)) {
-    throw new UnauthorizedError('Role tidak valid.');
+    throw new UnauthorizedError('Role tidak valid untuk NutriCare. Perawat dan Dokter silakan gunakan aplikasi Nadi.');
   }
   
   return {
     id: 'demo-user',
     role: roleHeader as any,
     nama: roleHeader === 'ahli-gizi' ? 'Ahli Gizi' : 
-          roleHeader === 'perawat' ? 'Perawat' :
           roleHeader === 'waiter' ? 'Waiter' :
           roleHeader === 'dapur' ? 'Petugas Dapur' : 'Petugas Logistik',
   };
@@ -72,6 +71,10 @@ export async function getAuthUser(token: string): Promise<AuthUser> {
   
   const profile = result.rows[0];
   
+  if (profile.role === 'perawat' || profile.role === 'dokter') {
+    throw new UnauthorizedError('Akun Perawat/Dokter harus mengakses aplikasi Nadi, bukan NutriCare.');
+  }
+
   const user: AuthUser = {
     id: profile.id,
     role: profile.role,

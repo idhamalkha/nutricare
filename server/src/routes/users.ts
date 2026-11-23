@@ -18,13 +18,15 @@ import {
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-async function findProfile(id: string): Promise<{ id: string; foto_profil: string | null }> {
+async function findProfile(
+  id: string
+): Promise<{ id: string; foto_profil: string | null; role: string }> {
   if (!UUID_RE.test(id)) {
     throw new ValidationError('ID pengguna tidak valid.');
   }
 
   const result = await pool.query(
-    'SELECT id, foto_profil FROM profiles WHERE id = $1',
+    'SELECT id, foto_profil, role FROM profiles WHERE id = $1',
     [id]
   );
 
@@ -32,7 +34,11 @@ async function findProfile(id: string): Promise<{ id: string; foto_profil: strin
     throw new NotFoundError('Pengguna tidak ditemukan.');
   }
 
-  return result.rows[0];
+  const profile = result.rows[0];
+  if (profile.role === 'perawat' || profile.role === 'dokter') {
+    throw new AppError(403, 'Akun Perawat/Dokter dikelola melalui Nadi.', 'USER_MANAGED_BY_NADI');
+  }
+  return profile;
 }
 
 const userPhotoRoutes: FastifyPluginAsync = async (fastify) => {

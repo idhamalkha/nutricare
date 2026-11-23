@@ -118,13 +118,17 @@ Server akan berjalan di http://localhost:3000
 
 ### Mode Demo (Development)
 - Tanpa token
-- Kirim header `X-NC-Role: ahli-gizi` (atau `perawat`, `waiter`, `logistik`)
+- Kirim header `X-NC-Role: ahli-gizi`, `waiter`, `logistik`, atau `dapur`
 - Cocok untuk development dan testing
 
 ### Mode Strict (Production)
 - Wajib Bearer token dari Supabase Auth
 - Login lewat `/api/auth/login`
 - Token divalidasi setiap request
+
+Akun Perawat dan Dokter dikelola serta digunakan melalui aplikasi Nadi. Panel admin
+NutriCare hanya menampilkan dan mengelola akun untuk peran NutriCare; akun Nadi
+tetap berada di database bersama dan tidak dihapus.
 
 ## API Endpoints
 

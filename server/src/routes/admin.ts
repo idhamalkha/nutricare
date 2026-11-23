@@ -12,7 +12,7 @@ interface CreateUserBody {
   email: string;
   password: string;
   nama: string;
-  role: 'ahli-gizi' | 'perawat' | 'waiter' | 'logistik' | 'dapur';
+  role: 'ahli-gizi' | 'waiter' | 'logistik' | 'dapur';
   telepon?: string;
 }
 
@@ -20,7 +20,7 @@ interface UpdateUserBody {
   email?: string;
   password?: string;
   nama?: string;
-  role?: 'ahli-gizi' | 'perawat' | 'waiter' | 'logistik' | 'dapur';
+  role?: 'ahli-gizi' | 'waiter' | 'logistik' | 'dapur';
   telepon?: string;
 }
 
@@ -33,6 +33,7 @@ const adminRoutes: FastifyPluginAsync = async (fastify) => {
         SELECT p.id, p.nama, p.role, p.telepon, p.aktif, p.foto_profil, u.email
         FROM profiles p
         LEFT JOIN auth.users u ON u.id = p.id
+        WHERE p.role NOT IN ('perawat', 'dokter')
         ORDER BY p.created_at DESC
       `);
 
@@ -57,7 +58,7 @@ const adminRoutes: FastifyPluginAsync = async (fastify) => {
       throw new ValidationError('Password minimal 8 karakter');
     }
 
-    if (!['ahli-gizi', 'perawat', 'waiter', 'logistik', 'dapur'].includes(role)) {
+    if (!['ahli-gizi', 'waiter', 'logistik', 'dapur'].includes(role)) {
       throw new ValidationError('Role tidak valid');
     }
 
@@ -115,7 +116,7 @@ const adminRoutes: FastifyPluginAsync = async (fastify) => {
         // Check constraint violation (e.g., invalid role)
         return reply.status(422).send({
           success: false,
-          error: 'Role tidak valid. Pilih salah satu: Ahli Gizi, Perawat, Waiter, Logistik, atau Dapur',
+          error: 'Role tidak valid. Pilih salah satu: Ahli Gizi, Waiter, Logistik, atau Dapur',
         });
       }
       
@@ -151,12 +152,23 @@ const adminRoutes: FastifyPluginAsync = async (fastify) => {
         throw new ValidationError('Nama dan role wajib diisi');
       }
 
-      if (!['ahli-gizi', 'perawat', 'waiter', 'logistik', 'dapur'].includes(role)) {
+      if (!['ahli-gizi', 'waiter', 'logistik', 'dapur'].includes(role)) {
         throw new ValidationError('Role tidak valid');
       }
 
       if (password && password.length < 8) {
         throw new ValidationError('Password minimal 8 karakter');
+      }
+
+      const currentProfile = await pool.query('SELECT role FROM profiles WHERE id = $1', [id]);
+      if (currentProfile.rowCount === 0) {
+        throw new NotFoundError('Pengguna tidak ditemukan');
+      }
+      if (currentProfile.rows[0].role === 'perawat' || currentProfile.rows[0].role === 'dokter') {
+        return reply.status(403).send({
+          success: false,
+          error: 'Akun Perawat/Dokter dikelola melalui Nadi.',
+        });
       }
 
       try {
@@ -202,6 +214,17 @@ const adminRoutes: FastifyPluginAsync = async (fastify) => {
     assertAdminKey(request, 'menghapus pengguna');
     const { id } = request.params;
 
+    const currentProfile = await pool.query('SELECT role FROM profiles WHERE id = $1', [id]);
+    if (currentProfile.rowCount === 0) {
+      throw new NotFoundError('Pengguna tidak ditemukan');
+    }
+    if (currentProfile.rows[0].role === 'perawat' || currentProfile.rows[0].role === 'dokter') {
+      return reply.status(403).send({
+        success: false,
+        error: 'Akun Perawat/Dokter dikelola melalui Nadi.',
+      });
+    }
+
     try {
       // Delete from Supabase Auth
       const { error: authError } = await admin.auth.admin.deleteUser(id);
@@ -232,8 +255,6 @@ const adminRoutes: FastifyPluginAsync = async (fastify) => {
     const defaultUsers = [
       { email: 'ahligizi1@nutricare.com', nama: 'Dr. Sarah Nutritionist', role: 'ahli-gizi' },
       { email: 'ahligizi2@nutricare.com', nama: 'Dr. Budi Gizi', role: 'ahli-gizi' },
-      { email: 'perawat1@nutricare.com', nama: 'Siti Perawat', role: 'perawat' },
-      { email: 'perawat2@nutricare.com', nama: 'Ani Ruangan', role: 'perawat' },
       { email: 'waiter1@nutricare.com', nama: 'Joko Distribusi', role: 'waiter' },
       { email: 'waiter2@nutricare.com', nama: 'Rina Antar', role: 'waiter' },
       { email: 'logistik1@nutricare.com', nama: 'Rudi Gudang', role: 'logistik' },

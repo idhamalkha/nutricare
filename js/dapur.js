@@ -371,6 +371,7 @@ function printOrderMarkup(item, kind) {
     ['Nomor pesanan', orderNumber(item)],
     ['Tanggal', date(item.tanggal)],
     ['Nama pasien', item.pasien || '-'],
+    ['Dokter penanggung jawab', item.dokter || '-'],
     ['Ruangan', item.ruangan || '-'],
     ['Waktu makan', item.waktu || '-'],
     ['Menu', item.menu || '-'],
