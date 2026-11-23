@@ -220,7 +220,7 @@ const NotificationCenter = {
             pasien: 'Data pasien',
             rekomendasi: 'Rekomendasi menu',
             distribusi: 'Distribusi makan',
-            dapur: 'Kesiapan dapur',
+            dapur: 'Kesiapan dapur', evaluasi: 'Evaluasi makanan pasien',
             umum: 'Rincian notifikasi'
         };
         return labels[kind] || labels.umum;
@@ -413,7 +413,7 @@ const NotificationCenter = {
         const kind = detail && detail.kind ? String(detail.kind) : '';
         if (link) return { href: link, label: detail ? this.actionLabel(link, kind) : 'Buka halaman terkait' };
 
-        const anchor = { pasien: '#pasien', rekomendasi: '#rekomendasi', distribusi: '#distribusi', dapur: '#dapur' }[kind];
+        const anchor = { pasien: '#pasien', rekomendasi: '#rekomendasi', distribusi: '#distribusi', dapur: '#dapur', evaluasi: '#evaluasi' }[kind];
         if (!anchor) return null;
         const page = location.pathname.indexOf('/pages/') !== -1 ? location.pathname : '/pages/perawat.html';
         return { href: page + anchor, label: this.actionLabel(anchor, kind) };
@@ -425,12 +425,14 @@ const NotificationCenter = {
         if (label.indexOf('#rekomendasi') !== -1) return 'Buka rekomendasi menu';
         if (label.indexOf('#distribusi') !== -1) return 'Buka jadwal distribusi';
         if (label.indexOf('#dapur') !== -1) return 'Buka persiapan dapur';
+        if (label.indexOf('#evaluasi') !== -1) return 'Buka evaluasi makanan';
         if (label.indexOf('#jadwal') !== -1) return 'Buka jadwal makan';
         switch (kind) {
             case 'pasien': return 'Buka data pasien';
             case 'rekomendasi': return 'Buka rekomendasi menu';
             case 'distribusi': return 'Buka jadwal distribusi';
             case 'dapur': return 'Buka persiapan dapur';
+            case 'evaluasi': return 'Buka evaluasi makanan';
             default: return 'Buka halaman terkait';
         }
     },

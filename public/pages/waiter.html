@@ -41,6 +41,7 @@
             <a href="#dashboard" class="nav-link"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg></span> Dashboard</a>
             <a href="#distribusi" class="nav-link"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"></circle><circle cx="12" cy="12" r="4"></circle></svg></span> Distribusi siap antar</a>
             <a href="#terkirim" class="nav-link"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M8.4 12.4l2.6 2.6 4.6-5.2"></path></svg></span> Sudah terkirim</a>
+            <a href="#pengambilan" class="nav-link"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="2"></rect><path d="M12 6v12"></path><path d="M12 12h9"></path></svg></span> Pengambilan ompreng</a>
             <a href="#laporan" class="nav-link"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" fill="none"><rect x="3" y="12" width="4" height="9" rx="1"></rect><rect x="10" y="7" width="4" height="14" rx="1"></rect><rect x="17" y="3" width="4" height="18" rx="1"></rect></svg></span> Laporan harian</a>
         </nav>
     </aside>
@@ -166,6 +167,25 @@
             <section class="panel"><div id="crud-terkirim"></div></section>
         </section>
 
+        <section class="page" id="pengambilan" data-title="Pengambilan ompreng">
+            <div class="page-head"><div><h1>Pengambilan ompreng</h1><p>Ambil ompreng pasien 30 menit setelah makanan dikonfirmasi terkirim, lalu catat apakah makanan habis atau tidak.</p></div></div>
+            <div class="grid-wide">
+                <section class="panel">
+                    <div class="panel-head"><div><h2>Antrean pengambilan</h2><p>Makanan terkirim hari ini yang ompreng-nya belum diambil.</p></div></div>
+                    <div id="crud-pengambilan"></div>
+                </section>
+                <section class="panel">
+                    <div class="panel-head"><div><h2>Catatan pengambilan</h2><p>Pastikan ompreng yang diambil sesuai pasien.</p></div></div>
+                    <div class="notice"><strong>Batas 30 menit</strong>Tombol ambil aktif setelah 30 menit sejak waktu makanan terkirim.</div>
+                    <div class="notice warn"><strong>Makanan tidak habis</strong>Ahli gizi akan mendatangi pasien untuk mencatat penyebabnya.</div>
+                </section>
+            </div>
+            <section class="panel">
+                <div class="panel-head"><div><h2>Sudah diambil hari ini</h2><p>Riwayat ompreng yang sudah diambil beserta hasilnya.</p></div></div>
+                <div id="crud-riwayat-ambil"></div>
+            </section>
+        </section>
+
         <section class="page" id="laporan" data-title="Laporan harian">
             <div class="page-head">
                 <div>
@@ -207,6 +227,20 @@
                 </div>
             </section>
         </section>
+
+        <dialog id="dialog-ambil" class="nc-confirm-dialog" aria-labelledby="dialog-ambil-title">
+            <form method="dialog" class="nc-confirm-card">
+                <div class="confirm-icon" aria-hidden="true">?</div>
+                <h2 id="dialog-ambil-title">Ambil ompreng</h2>
+                <p id="dialog-ambil-detail"></p>
+                <p class="form-msg" id="dialog-ambil-msg" role="alert"></p>
+                <div class="confirm-actions">
+                    <button type="button" class="btn btn-ghost" data-ambil-cancel>Batal</button>
+                    <button type="button" class="btn btn-ghost" data-ambil-hasil="Tidak habis">Makanan tidak habis</button>
+                    <button type="button" class="btn" data-ambil-hasil="Habis">Makanan habis</button>
+                </div>
+            </form>
+        </dialog>
 
         <dialog id="konfirmasi-terkirim" class="nc-confirm-dialog" aria-labelledby="konfirmasi-terkirim-title">
             <form method="dialog" class="nc-confirm-card">

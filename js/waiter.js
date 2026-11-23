@@ -86,6 +86,123 @@
         ]
     });
 
+    // ---- Pengambilan ompreng ----
+    var BATAS_MENIT = 30;
+    var queue = NC.store('pengambilan');
+    var history = NC.store('riwayatPengambilan');
+    var ambilDialog = document.getElementById('dialog-ambil');
+    var ambilMsg = document.getElementById('dialog-ambil-msg');
+    var pendingAmbil = null;
+
+    function menitBerlalu(row) {
+        var t = Date.parse(row.terkirimAt || '');
+        return isNaN(t) ? 0 : Math.floor((Date.now() - t) / 60000);
+    }
+    function sisaMenit(row) { return Math.max(0, BATAS_MENIT - menitBerlalu(row)); }
+    function siapDiambil(row) { return sisaMenit(row) === 0; }
+
+    function bukaAmbil(row) {
+        pendingAmbil = row;
+        ambilMsg.textContent = '';
+        document.getElementById('dialog-ambil-detail').textContent =
+            row.pasien + ' · Ruangan ' + row.ruangan + ' · ' + row.waktu + ' · ' + row.menu +
+            '. Apakah makanan pasien habis?';
+        ambilDialog.showModal();
+    }
+
+    ambilDialog.querySelector('[data-ambil-cancel]').addEventListener('click', function () {
+        pendingAmbil = null;
+        ambilDialog.close();
+    });
+    ambilDialog.addEventListener('click', function (event) {
+        if (event.target === ambilDialog) { pendingAmbil = null; ambilDialog.close(); }
+    });
+    ambilDialog.addEventListener('close', function () { pendingAmbil = null; });
+    ambilDialog.querySelectorAll('[data-ambil-hasil]').forEach(function (button) {
+        button.addEventListener('click', async function () {
+            if (!pendingAmbil || button.disabled) return;
+            var row = pendingAmbil;
+            var hasil = button.getAttribute('data-ambil-hasil');
+            var tombol = ambilDialog.querySelectorAll('[data-ambil-hasil]');
+            var label = button.textContent;
+            tombol.forEach(function (b) { b.disabled = true; });
+            button.setAttribute('aria-busy', 'true');
+            button.textContent = 'Menyimpan...';
+            ambilMsg.textContent = '';
+            try {
+                await api.requestAsync('POST', '/pengambilan', { jadwalId: row.id, hasil: hasil });
+                api.invalidate();
+                queue.refresh();
+                history.refresh();
+                pendingAmbil = null;
+                ambilDialog.close();
+                NC.renderAll();
+                NC.toast(hasil === 'Habis'
+                    ? 'Ompreng diambil. Makanan pasien habis.'
+                    : 'Ompreng diambil. Ahli gizi akan menindaklanjuti makanan yang tidak habis.', 'success');
+            } catch (error) {
+                ambilMsg.textContent = error.message || 'Pengambilan gagal dicatat. Coba lagi.';
+            } finally {
+                tombol.forEach(function (b) { b.disabled = false; });
+                button.removeAttribute('aria-busy');
+                button.textContent = label;
+            }
+        });
+    });
+
+    NC.crud({
+        mount: '#crud-pengambilan',
+        store: queue,
+        noun: 'antrean pengambilan',
+        readOnly: true,
+        searchPlaceholder: 'Cari pasien, menu, atau ruangan',
+        search: ['pasien', 'menu', 'ruangan', 'waktu'],
+        sort: function (a, b) { return String(a.terkirimAt).localeCompare(String(b.terkirimAt)); },
+        empty: { title: 'Tidak ada ompreng yang menunggu diambil', hint: 'Ompreng muncul di sini setelah makanan dikonfirmasi terkirim.' },
+        columns: [
+            { label: 'Pasien & ruangan', render: function (row) { return '<strong>' + NC.esc(row.pasien) + '</strong><small>Ruangan ' + NC.esc(row.ruangan) + '</small>'; } },
+            { label: 'Waktu makan', render: function (row) { return NC.esc(row.waktu) + ' · terkirim ' + NC.esc(row.jamTerkirim); } },
+            { label: 'Menu', render: function (row) { return NC.esc(row.menu); } },
+            { label: 'Status', render: function (row) {
+                return siapDiambil(row)
+                    ? '<span class="badge good">Siap diambil</span>'
+                    : '<span class="badge warning">Tunggu ' + sisaMenit(row) + ' menit</span>';
+            } }
+        ],
+        actions: [
+            { label: 'Ambil ompreng', show: siapDiambil, run: bukaAmbil }
+        ]
+    });
+
+    NC.crud({
+        mount: '#crud-riwayat-ambil',
+        store: history,
+        noun: 'riwayat pengambilan',
+        readOnly: true,
+        searchPlaceholder: 'Cari pasien, menu, atau ruangan',
+        search: ['pasien', 'menu', 'ruangan', 'hasil'],
+        filter: { label: 'Hasil', options: ['Habis', 'Tidak habis'], key: 'hasil' },
+        empty: { title: 'Belum ada ompreng yang diambil hari ini', hint: 'Riwayat muncul setelah waiter mencatat pengambilan.' },
+        columns: [
+            { label: 'Pasien & ruangan', render: function (row) { return '<strong>' + NC.esc(row.pasien) + '</strong><small>Ruangan ' + NC.esc(row.ruangan) + '</small>'; } },
+            { label: 'Waktu makan', render: function (row) { return NC.esc(row.waktu) + ' · diambil ' + NC.esc(row.jamDiambil); } },
+            { label: 'Menu', render: function (row) { return NC.esc(row.menu); } },
+            { label: 'Hasil', render: function (row) {
+                return row.hasil === 'Habis'
+                    ? '<span class="badge good">Habis</span>'
+                    : '<span class="badge warning">Tidak habis</span>';
+            } }
+        ]
+    });
+
+    // Perbarui hitung mundur tiap 30 detik, kecuali pengguna sedang mengetik atau dialog terbuka.
+    setInterval(function () {
+        var active = document.activeElement;
+        var typing = active && /^(INPUT|SELECT|TEXTAREA)$/.test(active.tagName);
+        if (typing || ambilDialog.open || dialog.open) return;
+        NC.renderAll();
+    }, 30000);
+
     function renderTable(rows, emptyTitle, emptyHint) {
         if (!rows.length) return '<div class="empty"><strong>' + NC.esc(emptyTitle) + '</strong><p>' + NC.esc(emptyHint) + '</p></div>';
         return '<div class="table-wrap"><table><thead><tr><th>Jam</th><th>Pasien</th><th>Menu</th><th>Status</th></tr></thead><tbody>' +

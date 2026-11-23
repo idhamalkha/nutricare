@@ -45,6 +45,7 @@
             <a href="#jadwal" class="nav-link"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5V12l3 2"></path></svg></span> Jadwal makan</a>
             <a href="#perawat" class="nav-link"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4.5" width="14" height="16" rx="2"></rect><path d="M9 4.5V3.8A1.3 1.3 0 0 1 10.3 2.5h3.4A1.3 1.3 0 0 1 15 3.8v.7z"></path><path d="M8.5 11h7"></path><path d="M8.5 15h4"></path></svg></span> Informasi perawat</a>
             <a href="#bahan" class="nav-link"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5 12 3l8.5 4.5v9L12 21l-8.5-4.5z"></path><path d="M3.5 7.5 12 12l8.5-4.5"></path><path d="M12 12v9"></path></svg></span> Ketersediaan bahan</a>
+            <a href="#evaluasi" class="nav-link"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4.5" width="14" height="16" rx="2"></rect><path d="M8.5 10.5l2 2 4-4.5"></path><path d="M8.5 16h7"></path></svg></span> Evaluasi makanan pasien</a>
             <a href="#riwayat" class="nav-link"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M3.8 12a8.2 8.2 0 1 0 2.6-6"></path><path d="M3.5 4.5V9H8"></path><path d="M12 8v4.5l3 1.8"></path></svg></span> Riwayat rekomendasi</a>
             <a href="#laporan" class="nav-link"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v16h16"></path><rect x="7.5" y="12" width="3" height="5"></rect><rect x="13" y="8.5" width="3" height="8.5"></rect></svg></span> Laporan dan grafik</a>
         </nav>
@@ -281,6 +282,27 @@
                 <div id="crud-bahan"></div>
             </section>
         </section>
+        <!-- ---------- EVALUASI MAKANAN PASIEN ---------- -->
+        <section class="page" id="evaluasi" data-title="Evaluasi makanan pasien">
+            <div class="page-head">
+                <div>
+                    <h1>Evaluasi makanan pasien</h1>
+                    <p>Pasien yang tidak menghabiskan makanan. Datangi pasien, lalu catat makanan apa yang tersisa dan alasannya.</p>
+                </div>
+            </div>
+
+            <div class="ledger">
+                <div class="ledger-cell"><div class="ledger-label">Perlu evaluasi</div><div class="ledger-value" id="ev-perlu">0</div><div class="ledger-note bad">Menunggu kunjungan ahli gizi</div></div>
+                <div class="ledger-cell"><div class="ledger-label">Sudah dievaluasi</div><div class="ledger-value" id="ev-selesai">0</div><div class="ledger-note ok">Catatan sudah diisi</div></div>
+            </div>
+
+            <section class="panel">
+                <div class="panel-head">
+                    <div><h2>Daftar makanan tidak habis</h2><p>Hanya makanan yang ditandai tidak habis oleh waiter.</p></div>
+                </div>
+                <div id="crud-evaluasi"></div>
+            </section>
+        </section>
         <!-- ---------- RIWAYAT ---------- -->
         <section class="page" id="riwayat" data-title="Riwayat rekomendasi">
             <div class="page-head">
@@ -484,6 +506,7 @@
     var jadwalStore = NC.store('jadwal');
 
     var perawatStore = NC.store('perawat');
+    var evaluasiStore = NC.store('evaluasi');
 
     /* ---------- Helper ---------- */
 
@@ -792,6 +815,52 @@
         }
     });
 
+    /* ---------- Evaluasi makanan pasien ---------- */
+
+    var evaluasiCrud = NC.crud({
+        mount: '#crud-evaluasi',
+        store: evaluasiStore,
+        noun: 'evaluasi makanan',
+        searchPlaceholder: 'Cari pasien, menu, atau ruangan',
+        search: ['pasien', 'menu', 'ruangan', 'alasan', 'bagianTersisa'],
+        filter: { label: 'Status', options: ['Perlu evaluasi', 'Selesai'], key: 'status' },
+        // Server sudah mengurutkan: yang perlu evaluasi tampil lebih dulu.
+        empty: { title: 'Belum ada makanan yang tidak habis', hint: 'Data muncul setelah waiter mengambil ompreng dan menandainya tidak habis.' },
+        columns: [
+            { label: 'Pasien & ruangan', render: function (r) { return '<strong>' + esc(r.pasien) + '</strong><small>Ruangan ' + esc(r.ruangan) + '</small>'; } },
+            { label: 'Makanan', render: function (r) { return esc(r.menu) + '<small>' + esc(r.waktu + ' · ' + NC.fmtDate(r.tanggal) + ' ' + r.jamDiambil) + '</small>'; } },
+            { label: 'Catatan evaluasi', render: function (r) {
+                return r.status === 'Selesai'
+                    ? '<strong>' + esc(r.bagianTersisa) + '</strong><small>' + esc(r.alasan) + '</small>'
+                    : '<span class="cell-empty">Belum diisi</span>';
+            } },
+            { label: 'Status', render: function (r) { return r.status === 'Selesai' ? '<span class="badge good">Selesai</span>' : '<span class="badge danger">Perlu evaluasi</span>'; } }
+        ],
+        actions: [
+            { label: 'Evaluasi', show: function (r) { return r.status !== 'Selesai'; }, run: function (r) { evaluasiCrud.open(r.id); } },
+            { label: 'Detail', show: function (r) { return r.status === 'Selesai'; }, run: function (r) {
+                NC.detail(r.pasien, [
+                    ['Ruangan', r.ruangan],
+                    ['Diagnosis', r.diagnosis],
+                    ['Makanan', r.menu + ' (' + r.waktu + ')'],
+                    ['Makanan yang tidak dihabiskan', r.bagianTersisa],
+                    ['Alasan tidak dihabiskan', r.alasan],
+                    ['Tindak lanjut', r.tindakLanjut || '-'],
+                    ['Dievaluasi', (r.dievaluasiPada || '-') + (r.evaluator ? ' oleh ' + r.evaluator : '')]
+                ]);
+            } }
+        ],
+        fields: [
+            { key: 'bagianTersisa', label: 'Makanan yang tidak dihabiskan', type: 'text', required: true, full: true, placeholder: 'Contoh: nasi dan sayur tersisa setengah' },
+            { key: 'alasan', label: 'Alasan tidak dihabiskan', type: 'textarea', required: true, full: true, placeholder: 'Tulis alasan menurut pasien atau hasil pengamatan' },
+            { key: 'tindakLanjut', label: 'Tindak lanjut (opsional)', type: 'textarea', full: true, placeholder: 'Contoh: ganti tekstur, ubah menu berikutnya' }
+        ],
+        formHint: 'Catat hasil kunjungan Anda ke pasien.',
+        // Respons PATCH hanya berisi id dan status, jadi muat ulang daftar agar kolom lain tetap lengkap.
+        saved: function () { evaluasiStore.refresh(); },
+        successMessage: function () { return 'Evaluasi disimpan.'; }
+    });
+
     /* ---------- Tabel baca: perawat, bahan, riwayat ---------- */
 
     NC.crud({
@@ -945,6 +1014,11 @@
             var n = jad.filter(function (j) { return j.waktu === s[0]; }).length;
             return '<div class="slot"><span>' + esc(s[0]) + '</span><strong>' + n + ' pasien</strong><span>' + esc(s[1]) + '</span></div>';
         }).join('');
+
+        /* evaluasi makanan */
+        var evs = evaluasiStore.all();
+        NC.set('ev-perlu', evs.filter(function (e) { return e.status !== 'Selesai'; }).length);
+        NC.set('ev-selesai', evs.filter(function (e) { return e.status === 'Selesai'; }).length);
 
         /* pantangan */
         var pant = pantStore.all();

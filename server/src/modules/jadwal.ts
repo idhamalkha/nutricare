@@ -61,7 +61,7 @@ export async function getDeliveredDistribution() {
 
 export async function markDelivered(id: string) {
   const result = await pool.query(
-    `UPDATE jadwal_makan j SET status = 'Terkirim'
+    `UPDATE jadwal_makan j SET status = 'Terkirim', terkirim_at = now()
      WHERE j.id = $1 AND j.deleted_at IS NULL AND j.status <> 'Terkirim'
        AND EXISTS (
          SELECT 1 FROM persiapan_dapur d

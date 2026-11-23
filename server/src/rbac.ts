@@ -3,7 +3,7 @@
 // C = Create, R = Read, U = Update, D = Delete, A = Action khusus
 
 type Role = 'ahli-gizi' | 'waiter' | 'logistik' | 'dapur';
-type Resource = 'pasien' | 'pantangan' | 'rekomendasi' | 'jadwal' | 'perawat' | 'bahan' | 'logistik';
+type Resource = 'pasien' | 'pantangan' | 'rekomendasi' | 'jadwal' | 'perawat' | 'bahan' | 'logistik' | 'pengambilan' | 'evaluasi';
 type Permission = 'create' | 'read' | 'update' | 'delete' | 'action';
 
 import { ForbiddenError } from './http/errors.js';
@@ -19,6 +19,8 @@ const permissions: Record<Role, Record<Resource, Permission[]>> = {
     perawat: ['create', 'read', 'update', 'delete', 'action'], // action = Tandai ditinjau
     bahan: ['create', 'read', 'update', 'delete'],
     logistik: ['read'], // Baca laporan/ringkasan saja
+    pengambilan: [],
+    evaluasi: ['read', 'update'], // Tindak lanjut makanan pasien yang tidak habis
   },
   waiter: {
     pasien: [],
@@ -29,6 +31,8 @@ const permissions: Record<Role, Record<Resource, Permission[]>> = {
     perawat: [],
     bahan: [],
     logistik: [],
+    pengambilan: ['read', 'action'], // action = catat pengambilan ompreng (Habis / Tidak habis)
+    evaluasi: [],
   },
   logistik: {
     pasien: [],
@@ -38,6 +42,8 @@ const permissions: Record<Role, Record<Resource, Permission[]>> = {
     perawat: [],
     bahan: ['create', 'read', 'update', 'delete'],
     logistik: ['create', 'read', 'update', 'delete'], // Modul logistik penuh
+    pengambilan: [],
+    evaluasi: [],
   },
   dapur: {
     // Tim dapur mengelola resep hidangan, menu paket diet, persiapan masak,
@@ -49,6 +55,8 @@ const permissions: Record<Role, Record<Resource, Permission[]>> = {
     perawat: [],
     bahan: ['read'],
     logistik: ['create', 'read', 'update', 'delete'], // Kelola resep, menu paket, dan persiapan
+    pengambilan: [],
+    evaluasi: [],
   },
 };
 

@@ -27,7 +27,12 @@
         var path = key === 'jadwal' && pageRole === 'waiter' ? '/jadwal/distribusi-siap' : allRoutes[key];
         return [key, path];
     }));
-    if (pageRole === 'waiter') routes.terkirim = '/jadwal/terkirim';
+    if (pageRole === 'waiter') {
+        routes.terkirim = '/jadwal/terkirim';
+        routes.pengambilan = '/pengambilan/antrean';
+        routes.riwayatPengambilan = '/pengambilan/riwayat';
+    }
+    if (pageRole === 'ahli-gizi') routes.evaluasi = '/evaluasi';
     routes.me = '/me';
     routes.preferensi = '/me/preferensi';
 

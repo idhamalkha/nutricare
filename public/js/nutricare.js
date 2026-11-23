@@ -237,7 +237,7 @@
     // menekan tombol lalu mendapat "Anda tidak memiliki izin untuk aksi ini.".
     // c=create, r=read, u=update, d=delete, a=action
     var IZIN_PERAN = {
-        'ahli-gizi': { pasien: 'crud', pantangan: 'crud', rekomendasi: 'crud', jadwal: 'crud', perawat: 'crud', bahan: 'crud', logistik: 'r' },
+        'ahli-gizi': { pasien: 'crud', pantangan: 'crud', rekomendasi: 'crud', jadwal: 'crud', perawat: 'crud', bahan: 'crud', logistik: 'r', evaluasi: '' },
         perawat: { pasien: 'crud', pantangan: 'crud', rekomendasi: 'r', jadwal: 'r', perawat: 'crud', bahan: '', logistik: '' },
         waiter: { pasien: '', pantangan: '', rekomendasi: '', jadwal: 'ra', perawat: '', bahan: '', logistik: '' },
         logistik: { pasien: '', pantangan: '', rekomendasi: 'r', jadwal: '', perawat: '', bahan: 'crud', logistik: 'crud' }
